@@ -664,7 +664,7 @@
         ],
         "withdrawWell": [
             {
-                "amount": 1.74446745023131e42,
+                "amount": 1.74446745023131e24,
                 "to": "ECOSYSTEM_RESERVE_PROXY"
             }
         ]

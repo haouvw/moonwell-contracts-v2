@@ -194,28 +194,25 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 JsonSpecExternalChain memory spec = externalChainActions[
                     chainId
                 ];
-                if (spec.initSale.reserveAutomationContracts.length > 0) {
-                    for (
-                        uint256 j = 0;
-                        j < spec.initSale.reserveAutomationContracts.length;
-                        j++
-                    ) {
-                        address reserveAutomationContract = addresses
-                            .getAddress(
-                                spec.initSale.reserveAutomationContracts[j]
-                            );
+                for (
+                    uint256 j = 0;
+                    j < spec.initSale.reserveAutomationContracts.length;
+                    j++
+                ) {
+                    address reserveAutomationContract = addresses.getAddress(
+                        spec.initSale.reserveAutomationContracts[j]
+                    );
 
-                        ReserveAutomation automation = ReserveAutomation(
-                            reserveAutomationContract
-                        );
-                        address reserveAsset = automation.reserveAsset();
+                    ReserveAutomation automation = ReserveAutomation(
+                        reserveAutomationContract
+                    );
+                    address reserveAsset = automation.reserveAsset();
 
-                        reserveAutomationBalancesBefore[
-                            reserveAutomationContract
-                        ] = IERC20(reserveAsset).balanceOf(
-                            reserveAutomationContract
-                        );
-                    }
+                    reserveAutomationBalancesBefore[
+                        reserveAutomationContract
+                    ] = IERC20(reserveAsset).balanceOf(
+                        reserveAutomationContract
+                    );
                 }
             }
         }
@@ -663,13 +660,15 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 addresses.getAddress(withdrawWell.to) ==
                 addresses.getAddress("ECOSYSTEM_RESERVE_PROXY")
             ) {
+                console.log(ecosystemReserveProxyAmount);
                 ecosystemReserveProxyAmount += withdrawWell.amount;
+                console.log(ecosystemReserveProxyAmount);
             }
 
             externalChainActions[_chainId].withdrawWell.push(withdrawWell);
         }
 
-        assertApproxEqAbs(
+        assertApproxEqRel(
             int256(ecosystemReserveProxyAmount),
             spec.stkWellEmissionsPerSecond *
                 int256(endTimeStamp - startTimeStamp),
@@ -1457,7 +1456,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         assertApproxEqRel(
                             balanceIncrease,
                             spec.transferReserves[j].amount,
-                            0.1e18,
+                            0.01e18,
                             "ReserveAutomation: reserves do not match transferReserves amount"
                         );
                     }
