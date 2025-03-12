@@ -1198,6 +1198,8 @@ contract MultichainProposalTest is PostProposalCheck {
 
         // PostProposalCheck warps to the future to execute proposals so we want make sure the
         // timestamp here is in the future
+        // If we don't do this the stake call fails if we have a rewards automation proposal live
+        // because stkWell.configureAsset updates the last updated timestamp variable.
         uint256 initialTimestamp = block.timestamp + 20 days;
 
         /// mint whichever is greater, the proposal threshold or the quorum
