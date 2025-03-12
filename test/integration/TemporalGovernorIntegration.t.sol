@@ -35,7 +35,10 @@ contract TemporalGovernorLiveSystem is Test, PostProposalCheck {
 
     function setUp() public override {
         uint256 primaryForkId = vm.envUint("PRIMARY_FORK_ID");
+        console.log("primary fork id",primaryForkId);
         super.setUp();
+
+        console.log("primary fork id", primaryForkId);
 
         vm.selectFork(primaryForkId);
 
