@@ -2958,5 +2958,32 @@ contract MultichainProposalTest is PostProposalCheck {
         );
     }
 
+    function testGuardianCanPauseTemporalGovernor() public {
+        vm.selectFork(BASE_FORK_ID);
+        TemporalGovernor gov = TemporalGovernor(
+            payable(addresses.getAddress("TEMPORAL_GOVERNOR"))
+        );
+
+        vm.prank(addresses.getAddress("SECURITY_COUNCIL"));
+        gov.togglePause();
+
+        assertTrue(gov.paused());
+        assertFalse(gov.guardianPauseAllowed());
+        assertEq(gov.lastPauseTime(), block.timestamp);
+
+        vm.selectFork(OPTIMISM_FORK_ID);
+
+        TemporalGovernor gov = TemporalGovernor(
+            payable(addresses.getAddress("TEMPORAL_GOVERNOR"))
+        );
+
+        vm.prank(addresses.getAddress("SECURITY_COUNCIL"));
+        gov.togglePause();
+
+        assertTrue(gov.paused());
+        assertFalse(gov.guardianPauseAllowed());
+        assertEq(gov.lastPauseTime(), block.timestamp);
+    }
+
     receive() external payable {}
 }
