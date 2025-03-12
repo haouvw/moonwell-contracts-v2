@@ -2973,7 +2973,7 @@ contract MultichainProposalTest is PostProposalCheck {
 
         vm.selectFork(OPTIMISM_FORK_ID);
 
-        TemporalGovernor gov = TemporalGovernor(
+        gov = TemporalGovernor(
             payable(addresses.getAddress("TEMPORAL_GOVERNOR"))
         );
 
