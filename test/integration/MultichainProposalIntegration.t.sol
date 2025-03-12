@@ -1196,7 +1196,9 @@ contract MultichainProposalTest is PostProposalCheck {
     function testVotingOnBasestkWellSucceeds() public {
         vm.selectFork(MOONBEAM_FORK_ID);
 
-        uint256 initialTimestamp = block.timestamp + 1 days;
+        // PostProposalCheck warps to the future to execute proposals so we want make sure the
+        // timestamp here is in the future
+        uint256 initialTimestamp = block.timestamp + 20 days;
 
         /// mint whichever is greater, the proposal threshold or the quorum
         uint256 mintAmount = governor.proposalThreshold() > governor.quorum()
@@ -1210,6 +1212,7 @@ contract MultichainProposalTest is PostProposalCheck {
         vm.roll(block.number + 1);
 
         vm.selectFork(BASE_FORK_ID);
+        vm.warp(initialTimestamp);
 
         xwell = xWELL(addresses.getAddress("xWELL_PROXY"));
         uint256 xwellMintAmount = xwell.buffer(
@@ -1220,14 +1223,10 @@ contract MultichainProposalTest is PostProposalCheck {
         xwell.mint(address(this), xwellMintAmount);
         xwell.approve(address(stakedWellBase), xwellMintAmount);
 
-        console.log("current timestamp", block.timestamp);
-
         stakedWellBase.stake(address(this), xwellMintAmount);
 
-        vm.warp(initialTimestamp);
-
         vm.selectFork(MOONBEAM_FORK_ID);
-        vm.warp(initialTimestamp);
+        vm.warp(initialTimestamp + 1);
 
         address[] memory targets = new address[](1);
         uint256[] memory values = new uint256[](1);
