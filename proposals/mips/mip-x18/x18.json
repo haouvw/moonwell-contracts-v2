@@ -80,12 +80,6 @@
                 "irm": "",
                 "market": "MOONWELL_mETH",
                 "reserveFactor": -1
-            },
-            {
-                "collateralFactor": -1,
-                "irm": "",
-                "market": "mxcDOT",
-                "reserveFactor": -1
             }
         ],
         "irModels": []
