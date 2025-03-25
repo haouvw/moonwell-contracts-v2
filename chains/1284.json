@@ -328,5 +328,10 @@
         "addr": "0xe9ffd686ca83ceb308962f4e50c5fd7f2e3c037e",
         "name": "MARKET_ADD_CHECKER",
         "isContract": true
+    },
+    {
+        "addr": "0x80308dCE5bd550209FDb22871ce411869014EE8E",
+        "name": "API3_GLMR_USD_FEED",
+        "isContract": true
     }
 ]
