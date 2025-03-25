@@ -62,7 +62,7 @@ contract mipm42 is HybridProposal {
 
         assertEq(
             oracle.getChainlinkPrice(
-                getFeed(ERC20(addresses.getAddress("mGLMR")).symbol())
+                oracle.getFeed(ERC20(addresses.getAddress("mGLMR")).symbol())
             ),
             uint256(price),
             "Wrong Price"
