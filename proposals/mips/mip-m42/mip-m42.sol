@@ -9,6 +9,7 @@ import {ERC20} from "@openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {ProposalActions} from "@proposals/utils/ProposalActions.sol";
 import {IApi3ReaderProxy} from "@protocol/oracles/IApi3ReaderProxy.sol";
 import {ChainlinkOracle} from "@protocol/oracles/ChainlinkOracle.sol";
+import {AggregatorV3Interface} from "@protocol/oracles/AggregatorV3Interface.sol";
 import {MOONBEAM_FORK_ID} from "@utils/ChainIds.sol";
 import {HybridProposal, ActionType} from "@proposals/proposalTypes/HybridProposal.sol";
 import {AllChainAddresses as Addresses} from "@proposals/Addresses.sol";
@@ -48,8 +49,12 @@ contract mipm42 is HybridProposal {
             addresses.getAddress("CHAINLINK_ORACLE")
         );
 
+        AggregatorV3Interface feed = oracle.getFeed(
+            ERC20(addresses.getAddress("mGLMR")).symbol()
+        );
+
         assertEq(
-            oracle.getFeed(ERC20(addresses.getAddress("mGLMR")).symbol()),
+            address(feed),
             addresses.getAddress("API3_GLMR_USD_FEED"),
             "mGLMR feed not set"
         );
@@ -58,14 +63,10 @@ contract mipm42 is HybridProposal {
             addresses.getAddress("API3_GLMR_USD_FEED")
         );
 
-        (int256 price, uint256 timestamp) = reader.read();
+        (int256 api3Price, ) = reader.read();
 
-        assertEq(
-            oracle.getChainlinkPrice(
-                oracle.getFeed(ERC20(addresses.getAddress("mGLMR")).symbol())
-            ),
-            uint256(price),
-            "Wrong Price"
-        );
+        (, int256 chainlinkPrice, , , ) = feed.latestRoundData();
+
+        assertEq(uint256(chainlinkPrice), uint256(api3Price), "Wrong Price");
     }
 }
