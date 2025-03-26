@@ -970,6 +970,11 @@
         "name": "CHAINLINK_TBTC_USD_OEV_WRAPPER"
     },
     {
+        "addr": "0xF6475307E139d77BaCEf384eeEbbC2424C059c8F",
+        "name": "JUMP_RATE_IRM_MOONWELL_USDC_MIP_X18",
+        "isContract": true
+    },
+    {
         "addr": "0x6aa41dF8FB0deC976B59bf0824FC5fFB88ccA958",
         "isContract": true,
         "name": "CHAINLINK_VIRTUAL_USD_OEV_WRAPPER"
