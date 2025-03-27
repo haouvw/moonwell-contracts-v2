@@ -135,6 +135,11 @@
         "name": "CHAINLINK_OP_USD"
     },
     {
+        "addr": "0xfE733B170010439eB5272e6354133946946cd365",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_USDC_USDT_DAI_MIP_X18"
+    },
+    {
         "addr": "0x9560e827af36c94d2ac33a39bce1fe78631088db",
         "isContract": true,
         "name": "VELO"
