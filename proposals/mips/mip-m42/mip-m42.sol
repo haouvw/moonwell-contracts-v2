@@ -35,10 +35,10 @@ contract mipm42 is HybridProposal {
             addresses.getAddress("CHAINLINK_ORACLE"),
             abi.encodeWithSignature(
                 "setFeed(string,address)",
-                ERC20(addresses.getAddress("mGLMR")).symbol(),
+                ERC20(addresses.getAddress("mGLIMMER")).symbol(),
                 addresses.getAddress("API3_GLMR_USD_FEED")
             ),
-            "Set price feed for mGLMR"
+            "Set price feed for mGLIMMER"
         );
     }
 
@@ -50,13 +50,13 @@ contract mipm42 is HybridProposal {
         );
 
         AggregatorV3Interface feed = oracle.getFeed(
-            ERC20(addresses.getAddress("mGLMR")).symbol()
+            ERC20(addresses.getAddress("mGLIMMER")).symbol()
         );
 
         assertEq(
             address(feed),
             addresses.getAddress("API3_GLMR_USD_FEED"),
-            "mGLMR feed not set"
+            "mGLIMMER feed not set"
         );
 
         IApi3ReaderProxy reader = IApi3ReaderProxy(
