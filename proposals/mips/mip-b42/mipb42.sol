@@ -9,6 +9,7 @@ import {ITemporalGovernor} from "@protocol/governance/ITemporalGovernor.sol";
 
 contract mipb42 is MarketAddV2 {
     using ChainIds for uint256;
+
     function build(Addresses addresses) public override selectPrimaryFork {
         super.build(addresses);
 
@@ -65,13 +66,13 @@ contract mipb42 is MarketAddV2 {
         );
 
         _pushAction(
-            addresses.getAddress("MULTICHAIN_GOVERNOR"),
+            addresses.getAddress("MULTICHAIN_GOVERNOR_PROXY"),
             abi.encodeWithSignature(
                 "updateApprovedCalldata(bytes,bool)",
                 approvedCalldata,
                 true
             ),
-            "Update approved calldata to include Temporal Govenror"
+            "Update approved calldata to include Wormhole with Temporal Governor on Optimism"
         );
     }
 }
