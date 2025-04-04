@@ -1688,12 +1688,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     address rewardsDistributor,
                     uint256 rewardsDuration, // periodFinish
                     // rewardRate
-                    // lastUpdateTime
                     ,
                     ,
                     ,
 
                 ) = // rewardPerTokenStored
+                    // lastUpdateTime
                     multiRewards.rewardData(reward.rewardToken);
 
                 // Validate reward configuration
