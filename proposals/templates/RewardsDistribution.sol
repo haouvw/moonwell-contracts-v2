@@ -28,6 +28,7 @@ import {IMultiRewardDistributor} from "@protocol/rewards/IMultiRewardDistributor
 import {HybridProposal, ActionType} from "@proposals/proposalTypes/HybridProposal.sol";
 import {MultiRewardDistributorCommon} from "@protocol/rewards/MultiRewardDistributorCommon.sol";
 import {IERC20Metadata as IERC20} from "@openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {IMultiRewards} from "@crv-rewards/IMultiRewards.sol";
 
 contract RewardsDistributionTemplate is HybridProposal, Networks {
     using SafeCast for *;
@@ -85,6 +86,23 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         int256 newSupplySpeed;
     }
 
+    struct AddReward {
+        address distributor;
+        uint256 duration;
+        address rewardToken;
+    }
+
+    struct NotifyRewardAmount {
+        uint256 reward;
+        address rewardToken;
+    }
+
+    struct MultiRewarder {
+        AddReward[] addRewards;
+        NotifyRewardAmount[] notifyRewardAmount;
+        string vault;
+    }
+
     struct InitSale {
         uint256 auctionPeriod;
         uint256 delay;
@@ -104,6 +122,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
     struct JsonSpecExternalChain {
         InitSale initSale;
+        MultiRewarder[] multiRewarder;
         SetMRDRewardSpeed[] setRewardSpeed;
         int256 stkWellEmissionsPerSecond;
         TransferFrom[] transferFroms;
@@ -117,7 +136,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
     uint256 startTimeStamp;
     uint256 endTimeStamp;
 
-    mapping(uint256 chainid => JsonSpecExternalChain) externalChainActions;
+    mapping(uint256 => JsonSpecExternalChain) externalChainActions;
 
     /// @notice we save this value to check if the transferFrom amount was successfully transferred
     mapping(address => uint256) public wellBalancesBefore;
@@ -746,6 +765,58 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
 
             externalChainActions[_chainId].initSale = initSale;
+        }
+
+        // Add MultiRewarder configuration
+        for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
+            MultiRewarder memory rewarder = spec.multiRewarder[i];
+            address vault = addresses.getAddress(rewarder.vault);
+
+            // Configure rewards
+            for (uint256 j = 0; j < rewarder.addRewards.length; j++) {
+                AddReward memory reward = rewarder.addRewards[j];
+
+                _pushAction(
+                    vault,
+                    abi.encodeWithSignature(
+                        "addReward(address,address,uint256)",
+                        reward.rewardToken,
+                        reward.distributor,
+                        reward.duration
+                    ),
+                    string.concat(
+                        "Add reward token ",
+                        vm.getLabel(reward.rewardToken),
+                        " to vault ",
+                        vm.getLabel(vault),
+                        " with duration ",
+                        vm.toString(reward.duration)
+                    )
+                );
+            }
+
+            // Notify reward amounts
+            for (uint256 j = 0; j < rewarder.notifyRewardAmount.length; j++) {
+                NotifyRewardAmount memory notification = rewarder
+                    .notifyRewardAmount[j];
+
+                _pushAction(
+                    vault,
+                    abi.encodeWithSignature(
+                        "notifyRewardAmount(address,uint256)",
+                        notification.rewardToken,
+                        notification.reward
+                    ),
+                    string.concat(
+                        "Notify reward amount of ",
+                        vm.toString(notification.reward),
+                        " for token ",
+                        vm.getLabel(notification.rewardToken),
+                        " in vault ",
+                        vm.getLabel(vault)
+                    )
+                );
+            }
         }
     }
 
@@ -1599,6 +1670,117 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         );
                     }
                 }
+            }
+        }
+
+        // Validate MultiRewarder configurations
+        for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
+            MultiRewarder memory rewarder = spec.multiRewarder[i];
+            address vault = addresses.getAddress(rewarder.vault);
+            IMultiRewards multiRewards = IMultiRewards(vault);
+
+            // Validate addRewards configurations
+            for (uint256 j = 0; j < rewarder.addRewards.length; j++) {
+                AddReward memory reward = rewarder.addRewards[j];
+
+                // Get reward data from the contract
+                (
+                    address rewardsDistributor,
+                    uint256 rewardsDuration, // periodFinish
+                    // rewardRate
+                    // lastUpdateTime
+                    ,
+                    ,
+                    ,
+
+                ) = // rewardPerTokenStored
+                    multiRewards.rewardData(reward.rewardToken);
+
+                // Validate reward configuration
+                assertEq(
+                    rewardsDistributor,
+                    reward.distributor,
+                    string.concat(
+                        "Incorrect rewards distributor for token ",
+                        vm.getLabel(reward.rewardToken),
+                        " in vault ",
+                        vm.getLabel(vault)
+                    )
+                );
+
+                assertEq(
+                    rewardsDuration,
+                    reward.duration,
+                    string.concat(
+                        "Incorrect rewards duration for token ",
+                        vm.getLabel(reward.rewardToken),
+                        " in vault ",
+                        vm.getLabel(vault)
+                    )
+                );
+            }
+
+            // Validate notifyRewardAmount calls
+            for (uint256 j = 0; j < rewarder.notifyRewardAmount.length; j++) {
+                NotifyRewardAmount memory notification = rewarder
+                    .notifyRewardAmount[j];
+
+                // Get reward data from the contract
+                (
+                    ,
+                    // rewardsDistributor
+                    uint256 rewardsDuration,
+                    uint256 periodFinish,
+                    uint256 rewardRate, // lastUpdateTime
+                    ,
+
+                ) = // rewardPerTokenStored
+                    multiRewards.rewardData(notification.rewardToken);
+                {
+                    // Calculate expected reward rate
+                    uint256 expectedRewardRate = notification.reward /
+                        rewardsDuration;
+
+                    // Validate reward rate
+                    assertApproxEqRel(
+                        rewardRate,
+                        expectedRewardRate,
+                        0.01e18, // 1% tolerance for small rounding differences
+                        string.concat(
+                            "Incorrect reward rate for token ",
+                            vm.getLabel(notification.rewardToken),
+                            " in vault ",
+                            vm.getLabel(vault)
+                        )
+                    );
+                }
+
+                // Validate period finish
+                assertGt(
+                    periodFinish,
+                    block.timestamp,
+                    string.concat(
+                        "Reward period should not be finished for token ",
+                        vm.getLabel(notification.rewardToken),
+                        " in vault ",
+                        vm.getLabel(vault)
+                    )
+                );
+
+                // Validate total reward amount using the actual reward rate
+                uint256 remainingTime = periodFinish - block.timestamp;
+                uint256 remainingRewards = rewardRate * remainingTime;
+                assertApproxEqRel(
+                    remainingRewards,
+                    notification.reward,
+                    0.01e18, // 1% tolerance
+                    string.concat(
+                        "Incorrect remaining rewards for token ",
+                        vm.getLabel(notification.rewardToken),
+                        " in vault ",
+                        vm.getLabel(vault)
+                    )
+                );
             }
         }
     }
