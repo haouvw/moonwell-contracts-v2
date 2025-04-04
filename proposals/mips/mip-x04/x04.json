@@ -8,6 +8,7 @@
             "periodStartingPremium": 0,
             "reserveAutomationContracts": []
         },
+        "multiRewards": [],
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
@@ -371,6 +372,7 @@
             "periodStartingPremium": 0,
             "reserveAutomationContracts": []
         },
+        "multiRewards": [],
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
