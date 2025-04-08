@@ -314,6 +314,14 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             bytes32(uint256(153)),
             encodedData
         );
+
+        // TODO remove this after x19 execution
+        // mock foundation multisig allowance
+        vm.prank(addresses.getAddress("FOUNDATION_OP_MULTISIG"));
+        IERC20(addresses.getAddress("OP")).approve(
+            addresses.getAddress("TEMPORAL_GOVERNOR"),
+            type(uint256).max
+        );
     }
 
     function afterSimulationHook(Addresses addresses) public override {
