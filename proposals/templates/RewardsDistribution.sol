@@ -490,8 +490,8 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         if (spec.stkWellEmissionsPerSecond != -1) {
             assertLe(
                 spec.stkWellEmissionsPerSecond,
-                5e18,
-                "stkWellEmissionsPerSecond must be less than 5e18"
+                10e18,
+                "stkWellEmissionsPerSecond must be less than 10e18"
             );
 
             externalChainActions[_chainId].stkWellEmissionsPerSecond = spec
