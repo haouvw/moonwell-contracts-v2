@@ -318,11 +318,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         vm.selectFork(OPTIMISM_FORK_ID);
         // TODO remove this after x19 execution
         // mock foundation multisig allowance
-        vm.prank(addresses.getAddress("FOUNDATION_OP_MULTISIG"));
+        vm.startPrank(addresses.getAddress("FOUNDATION_OP_MULTISIG"));
         IERC20(addresses.getAddress("OP")).approve(
             addresses.getAddress("TEMPORAL_GOVERNOR"),
             type(uint256).max
         );
+        vm.stopPrank();
 
         vm.selectFork(primaryForkId());
     }
