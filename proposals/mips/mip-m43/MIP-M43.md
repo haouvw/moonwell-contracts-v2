@@ -152,8 +152,8 @@ verifiable by Moonwell community members
 
 **Voting**
 
-Yay - Moonwell will switch from using Chainlink to API3 on Moonbeam for all
-markets. API3 will distribute 80% of the OEV proceeds to Moonwell, via the
+Yay - Moonwell will switch from using Chainlink to API3 on Moonbeam (GLMR
+Market). API3 will distribute 80% of the OEV proceeds to Moonwell, via the
 addReserves function on the GLMR core market on Moonbeam.
 
 Nay - No changes will be made
