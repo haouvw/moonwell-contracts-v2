@@ -77,7 +77,7 @@
             },
             {
                 "collateralFactor": -1,
-                "irm": "JUMP_RATE_IRM_MOONWELL_WETH_X20",
+                "irm": "JUMP_RATE_IRM_MOONWELL_WETH_MIP_X20",
                 "market": "MOONWELL_WETH",
                 "reserveFactor": -1
             }
