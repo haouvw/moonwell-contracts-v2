@@ -65,12 +65,15 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
         uint256 count = 0;
 
         while (count < 10) {
-            IMultichainGovernor.ProposalState state = governor.state(
-                proposalId
-            );
+            // TODO remove this once we have the ability to cancel proposals
+            if (proposalId != 90) {
+                IMultichainGovernor.ProposalState state = governor.state(
+                    proposalId
+                );
 
-            if (state == IMultichainGovernor.ProposalState.Succeeded) {
-                _execProposal(addresses, governor, proposalId);
+                if (state == IMultichainGovernor.ProposalState.Succeeded) {
+                    _execProposal(addresses, governor, proposalId);
+                }
             }
 
             proposalId--;
