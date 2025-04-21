@@ -128,7 +128,7 @@
             {
                 "collateralFactor": 0.5e18,
                 "irm": "",
-                "market": "xcUSDC",
+                "market": "mxcUSDC",
                 "reserveFactor": -1
             }
         ],
