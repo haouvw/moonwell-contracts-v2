@@ -121,3 +121,5 @@ gambit_out*
 
 # fuzz and invariant testing
 cache/
+
+proposal.sh

@@ -628,5 +628,10 @@
         "addr": "0x50d3E1BD46235ce1cCf133a74e10cfdc58d49E90",
         "isContract": true,
         "name": "USDC_METAMORPHO_FEE_SPLITTER"
+    },
+    {
+        "addr": "0x01bff41798a0bcf287b996046ca68b395dbc1071",
+        "isContract": true,
+        "name": "USDT0"
     }
 ]
