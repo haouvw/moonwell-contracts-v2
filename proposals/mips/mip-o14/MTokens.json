@@ -15,7 +15,7 @@
             "priceFeedName": "CHAINLINK_USDT_USD",
             "reserveFactor": 0.1e18,
             "seizeShare": 0.03e18,
-            "supplyCap": 4500000e18,
+            "supplyCap": 1000000e6,
             "symbol": "mUSDT0",
             "tokenAddressName": "USDT0"
         }
