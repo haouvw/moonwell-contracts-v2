@@ -16,7 +16,7 @@
             "reserveFactor": 0.1e18,
             "seizeShare": 0.03e18,
             "supplyCap": 4500000e18,
-            "symbol": "mUSDT",
+            "symbol": "mUSDT0",
             "tokenAddressName": "USDT0"
         }
     ]
