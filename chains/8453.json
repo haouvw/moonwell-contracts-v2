@@ -975,6 +975,16 @@
         "isContract": true
     },
     {
+        "addr": "0x59427E4e2EEDC6E7366a72CC91Bf324d2d35E88c",
+        "name": "JUMP_RATE_IRM_MOONWELL_USDC_MIP_X20",
+        "isContract": true
+    },
+    {
+        "addr": "0xc57723C94e9F7524aaDD2F6eeeC6D640BCd1FDca",
+        "name": "JUMP_RATE_IRM_MOONWELL_WETH_MIP_X20",
+        "isContract": true
+    },
+    {
         "addr": "0x6aa41dF8FB0deC976B59bf0824FC5fFB88ccA958",
         "isContract": true,
         "name": "CHAINLINK_VIRTUAL_USD_OEV_WRAPPER"
