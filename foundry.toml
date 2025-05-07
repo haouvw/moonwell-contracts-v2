@@ -56,3 +56,4 @@ opSepolia = { endpoint= "${OP_SEPOLIA_RPC_URL}", retries = 2, retry_backoff = 10
 #base = { key = "${BASESCAN_API_KEY}", url= "https://api.basescan.org/api" }
 #baseSepolia = { key = "${BASESCAN_API_KEY}", url= "https://sepolia.basescan.org/api" }
 #opSepolia = { key = "${OPSCAN_API_KEY}", url= "https://api.optimistic.etherscan.io/api" }
+
