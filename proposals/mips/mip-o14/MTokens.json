@@ -11,7 +11,7 @@
                 "kink": 0.9e18,
                 "multiplierPerYear": 0.0515e18
             },
-            "name": "Moonwell USDT",
+            "name": "Moonwell USDT0",
             "priceFeedName": "CHAINLINK_USDT_USD",
             "reserveFactor": 0.1e18,
             "seizeShare": 0.03e18,

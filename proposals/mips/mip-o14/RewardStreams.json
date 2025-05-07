@@ -10,7 +10,7 @@
         },
         {
             "borrowEmissionsPerSec": 1,
-            "emissionToken": "USDC",
+            "emissionToken": "OP",
             "endTime": 1749153554,
             "mToken": "MOONWELL_USDT0",
             "owner": "TEMPORAL_GOVERNOR",
