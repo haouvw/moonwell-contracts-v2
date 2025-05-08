@@ -369,19 +369,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         );
 
         moonbeamActions.addRewardInfo = spec.addRewardInfo;
-        console.log(
-            "addRewardInfo.target",
-            moonbeamActions.addRewardInfo.target
-        );
-        console.log(
-            "addRewardInfo.rewardPerSec",
-            moonbeamActions.addRewardInfo.rewardPerSec
-        );
-        console.log(
-            "addRewardInfo.amount",
-            moonbeamActions.addRewardInfo.amount
-        );
-
+ 
         for (uint256 i = 0; i < spec.bridgeWells.length; i++) {
             moonbeamActions.bridgeWells.push(spec.bridgeWells[i]);
         }
@@ -1282,7 +1270,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             } catch {
                 // rewardData does not exist, call addReward
                 _pushAction(
-                    addresses.getAddress(multiRewarder.distributor),
+                    addresses.getAddress(multiRewarder.vault),
                     abi.encodeWithSignature(
                         "addReward(address,address,uint256)",
                         rewardToken,
@@ -1293,10 +1281,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         "Add reward for ",
                         vm.getLabel(rewardToken),
                         " on ",
-                        multiRewarder.distributor,
+                        multiRewarder.vault,
                         " with duration ",
                         vm.toString(multiRewarder.duration),
-                        " on ",
+                        " with distributor ",
                         multiRewarder.distributor
                     )
                 );
