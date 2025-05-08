@@ -1794,12 +1794,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 (
                     address rewardsDistributor,
                     uint256 rewardsDuration, // periodFinish
-                    // rewardRate
+                    // rewardPerTokenStored
                     ,
                     ,
                     ,
 
-                ) = // rewardPerTokenStored
+                ) = // rewardRate
                     // lastUpdateTime
                     multiRewards.rewardData(
                         addresses.getAddress(reward.rewardToken)
@@ -1841,10 +1841,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     uint256 rewardsDuration,
                     uint256 periodFinish,
                     uint256 rewardRate, // lastUpdateTime
+                    // rewardPerTokenStored
                     ,
 
-                ) = // rewardPerTokenStored
-                    multiRewards.rewardData(
+                ) = multiRewards.rewardData(
                         addresses.getAddress(notification.rewardToken)
                     );
                 {

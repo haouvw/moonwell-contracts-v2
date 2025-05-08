@@ -8,7 +8,6 @@
             "periodStartingPremium": 0,
             "reserveAutomationContracts": []
         },
-        "multiRewards": [],
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
@@ -201,7 +200,8 @@
             }
         ],
         "transferReserves": [],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "1284": {
         "bridgeToRecipient": [
@@ -372,7 +372,6 @@
             "periodStartingPremium": 0,
             "reserveAutomationContracts": []
         },
-        "multiRewards": [],
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
@@ -565,7 +564,8 @@
             }
         ],
         "transferReserves": [],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1735270200,
     "startTimeStamp": 1732851000
