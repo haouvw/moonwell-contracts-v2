@@ -1331,7 +1331,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
         JsonSpecMoonbeam memory spec = moonbeamActions;
 
-        IERC20 well = IERC20(addresses.getAddress("xWELL_PROXY"));
+        IERC20 well = IERC20(addresses.getAddress("GOVTOKEN"));
         for (uint256 i = 0; i < spec.transferFroms.length; i++) {
             TransferFrom memory transferFrom = spec.transferFroms[i];
 
