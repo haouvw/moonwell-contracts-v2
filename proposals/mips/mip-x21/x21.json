@@ -256,7 +256,7 @@
                 "distributor": "USDC_MULTI_REWARDER",
                 "duration": 2419200,
                 "reward": 1.5679577577634004e23,
-                "rewardToken": "WELL",
+                "rewardToken": "xWELL_PROXY",
                 "vault": "USDC_METAMORPHO_VAULT"
             },
             {
