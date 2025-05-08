@@ -735,6 +735,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
         }
 
+{
         bytes memory initSaleBytes = vm.parseJson(
             data,
             string.concat(prefix, ".initSale")
@@ -801,6 +802,9 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
 
             externalChainActions[_chainId].initSale = initSale;
+
+
+}
 
             // multiRewarder
             bytes memory multiRewarderBytes = vm.parseJson(
