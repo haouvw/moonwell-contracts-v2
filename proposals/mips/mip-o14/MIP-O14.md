@@ -1,4 +1,4 @@
-# MIP-O14 Add USDT0 Martket to Moonwell on Optimism
+# MIP-O14 Add USDT0 Market to Moonwell on Optimism
 
 ## Sumary
 
