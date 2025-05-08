@@ -828,7 +828,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         multiRewarder.rewardToken
                     );
                         assertEq(
-                        rewardToken == addresses.getAddress("WELL"),
+                        rewardToken == addresses.getAddress("xWELL_PROXY"),
                             rewardToken == addresses.getAddress("OP"),
                             "MultiRewarder: reward token must be WELL or OP"
                         );
@@ -879,7 +879,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             );
 
             address router = addresses.getAddress("xWELL_ROUTER");
-            address well = addresses.getAddress("WELL");
+            address well = addresses.getAddress("xWELL_PROXY");
 
             // first approve
             _pushAction(
@@ -1337,7 +1337,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
         JsonSpecMoonbeam memory spec = moonbeamActions;
 
-        IERC20 well = IERC20(addresses.getAddress("WELL"));
+        IERC20 well = IERC20(addresses.getAddress("xWELL_PROXY"));
         for (uint256 i = 0; i < spec.transferFroms.length; i++) {
             TransferFrom memory transferFrom = spec.transferFroms[i];
 
