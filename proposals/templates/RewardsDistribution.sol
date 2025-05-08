@@ -1224,6 +1224,52 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 );
             }
         }
+
+        for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
+            MultiRewarder memory multiRewarder = spec.multiRewarder[i];
+
+            for (uint256 j = 0; j < multiRewarder.addRewards.length; j++) {
+                AddReward memory addReward = multiRewarder.addRewards[j];
+                address distributor = addresses.getAddress(
+                    addReward.distributor
+                );
+                address rewardToken = addresses.getAddress(
+                    addReward.rewardToken
+                );
+
+                try IMultiRewards(distributor).rewardData(rewardToken) returns (
+                    address,
+                    uint256,
+                    uint256,
+                    uint256,
+                    uint256,
+                    uint256
+                ) {
+                    // rewardData exists
+                } catch {
+                    // rewardData does not exist, call addReward
+                    _pushAction(
+                        addresses.getAddress(addReward.distributor),
+                        abi.encodeWithSignature(
+                            "addReward(address,address,uint256)",
+                            rewardToken,
+                            distributor,
+                            addReward.duration
+                        ),
+                        string.concat(
+                            "Add reward for ",
+                            vm.getLabel(rewardToken),
+                            " on ",
+                            multiRewarder.addRewards[j].distributor,
+                            " with duration ",
+                            vm.toString(addReward.duration),
+                            " on ",
+                            multiRewarder.addRewards[j].distributor
+                        )
+                    );
+                }
+            }
+        }
     }
 
     function _validateMoonbeam(Addresses addresses) private {
@@ -1683,12 +1729,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 (
                     address rewardsDistributor,
                     uint256 rewardsDuration, // periodFinish
-                    // rewardPerTokenStored
+                    // rewardRate
                     ,
                     ,
                     ,
 
-                ) = // rewardRate
+                ) = // rewardPerTokenStored
                     // lastUpdateTime
                     multiRewards.rewardData(
                         addresses.getAddress(reward.rewardToken)
@@ -1730,10 +1776,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     uint256 rewardsDuration,
                     uint256 periodFinish,
                     uint256 rewardRate, // lastUpdateTime
-                    // rewardPerTokenStored
                     ,
 
-                ) = multiRewards.rewardData(
+                ) = // rewardPerTokenStored
+                    multiRewards.rewardData(
                         addresses.getAddress(notification.rewardToken)
                     );
                 {
