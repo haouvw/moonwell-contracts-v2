@@ -796,11 +796,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
         }
 
-        _processMultiRewarder(addresses, data, prefix, _chainId);
+        _processMultiRewarder(data, prefix, _chainId);
     }
 
     function _processMultiRewarder(
-        Addresses addresses,
         string memory data,
         string memory prefix,
         uint256 _chainId
@@ -870,7 +869,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             );
 
             address router = addresses.getAddress("xWELL_ROUTER");
-            address well = addresses.getAddress("xWELL_PROXY");
+            address well = addresses.getAddress("GOVTOKEN");
 
             // first approve
             _pushAction(
