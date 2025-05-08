@@ -9,7 +9,6 @@
             "reserveAutomationContracts": [
                 "RESERVE_AUTOMATION_DAI",
                 "RESERVE_AUTOMATION_WBTC",
-                "RESERVE_AUTOMATION_WETH",
                 "RESERVE_AUTOMATION_wstETH",
                 "RESERVE_AUTOMATION_cbETH",
                 "RESERVE_AUTOMATION_rETH",
