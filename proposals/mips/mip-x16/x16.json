@@ -385,7 +385,7 @@
                 "RESERVE_AUTOMATION_AERO"
             ]
         },
-        "multiRewards": [],
+        "multiRewarder": [],
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",

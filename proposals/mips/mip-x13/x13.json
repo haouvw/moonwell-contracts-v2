@@ -376,7 +376,7 @@
                 "RESERVE_AUTOMATION_DAI"
             ]
         },
-        "multiRewards": [],
+        "multiRewarder": [],
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
