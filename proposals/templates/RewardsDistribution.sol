@@ -369,7 +369,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         );
 
         moonbeamActions.addRewardInfo = spec.addRewardInfo;
- 
+
         for (uint256 i = 0; i < spec.bridgeWells.length; i++) {
             moonbeamActions.bridgeWells.push(spec.bridgeWells[i]);
         }
@@ -1290,6 +1290,22 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 );
             }
 
+            // approve the vault to spend the reward token
+            _pushAction(
+                rewardToken,
+                abi.encodeWithSignature(
+                    "approve(address,uint256)",
+                    addresses.getAddress(multiRewarder.vault),
+                    multiRewarder.reward
+                ),
+                string.concat(
+                    "Approve ",
+                    vm.getLabel(rewardToken),
+                    " to ",
+                    vm.getLabel(addresses.getAddress(multiRewarder.vault))
+                )
+            );
+
             // Notify reward amount
             _pushAction(
                 addresses.getAddress(multiRewarder.vault),
@@ -1764,10 +1780,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
