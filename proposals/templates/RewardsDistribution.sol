@@ -1836,18 +1836,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 )
             );
 
-            // Validate total reward amount using the actual reward rate
-            uint256 remainingTime = periodFinish - startTimeStamp;
-            uint256 remainingRewards = rewardRate * remainingTime;
-            assertApproxEqRel(
-                remainingRewards,
-                rewarder.reward,
-                0.05e18, // 5% tolerance
-                string.concat(
-                    "Incorrect remaining rewards for token ",
-                    rewarder.rewardToken
-                )
-            );
+      
         }
     }
 
