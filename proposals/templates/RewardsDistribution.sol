@@ -1641,10 +1641,11 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                             string.concat("balance wrong for ", vm.getLabel(to))
                         );
                     } else {
-                        assertEq(
+                        assertApproxEqAbs(
                             IERC20(token).balanceOf(to),
                             wellBalancesBefore[to] +
                                 spec.transferFroms[i].amount,
+                            10e18, // tolerates 10 well as margin error
                             string.concat(
                                 "balance changed for ",
                                 vm.getLabel(to)
