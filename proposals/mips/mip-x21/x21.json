@@ -300,7 +300,6 @@
                 "target": "DEX_RELAYER"
             }
         ],
-        "multiRewarder": [],
         "transferFrom": [
             {
                 "amount": 1.1301278347382189e25,
