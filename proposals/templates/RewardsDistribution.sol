@@ -378,6 +378,18 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         );
 
         moonbeamActions.addRewardInfo = spec.addRewardInfo;
+        console.log(
+            "addRewardInfo.target",
+            moonbeamActions.addRewardInfo.target
+        );
+        console.log(
+            "addRewardInfo.rewardPerSec",
+            moonbeamActions.addRewardInfo.rewardPerSec
+        );
+        console.log(
+            "addRewardInfo.amount",
+            moonbeamActions.addRewardInfo.amount
+        );
 
         for (uint256 i = 0; i < spec.bridgeWells.length; i++) {
             moonbeamActions.bridgeWells.push(spec.bridgeWells[i]);
@@ -789,6 +801,59 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
 
             externalChainActions[_chainId].initSale = initSale;
+
+            // multiRewarder
+            bytes memory multiRewarderBytes = vm.parseJson(
+                data,
+                string.concat(prefix, ".multiRewarder")
+            );
+            MultiRewarder[] memory multiRewarder = abi.decode(
+                multiRewarderBytes,
+                (MultiRewarder[])
+            );
+
+            for (uint256 i = 0; i < multiRewarder.length; i++) {
+                MultiRewarder memory multiRewarder = multiRewarder[i];
+
+                for (uint256 j = 0; j < multiRewarder.addRewards.length; j++) {
+                    // safety check duration is 4 weeks
+                    assertEq(
+                        multiRewarder.addRewards[j].duration,
+                        2419200,
+                        "MultiRewarder: duration must be 4 weeks"
+                    );
+
+                    // safety check reward token is WELL or OP
+                    address rewardToken = addresses.getAddress(
+                        multiRewarder.addRewards[j].rewardToken
+                    );
+                    assertOr(
+                        rewardToken == addresses.getAddress("WELL"),
+                        rewardToken == addresses.getAddress("OP"),
+                        "MultiRewarder: reward token must be WELL or OP"
+                    );
+
+                    // push addRewards
+                    externalChainActions[_chainId].addRewards.push(
+                        multiRewarder.addRewards[j]
+                    );
+                }
+
+                for (
+                    uint256 j = 0;
+                    j < multiRewarder.notifyRewardAmount.length;
+                    j++
+                ) {
+                    // push notifyRewardAmount
+                    externalChainActions[_chainId].notifyRewardAmount.push(
+                        multiRewarder.notifyRewardAmount[j]
+                    );
+                }
+
+                externalChainActions[_chainId]
+                    .multiRewarder
+                    .vault = multiRewarder.vault;
+            }
         }
     }
 

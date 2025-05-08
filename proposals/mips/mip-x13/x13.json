@@ -200,7 +200,8 @@
                 "to": "RESERVE_AUTOMATION_WBTC"
             }
         ],
-        "withdrawReserves": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "1284": {
         "bridgeToRecipient": [
@@ -649,7 +650,7 @@
                 "to": "RESERVE_AUTOMATION_DAI"
             }
         ],
-        "withdrawReserves": []
+        "withdrawWell": []
     },
     "endTimeSTamp": 1742527800,
     "startTimeStamp": 1740108600

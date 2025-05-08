@@ -750,7 +750,8 @@
                 "amount": 7.220385460091446e24,
                 "to": "ECOSYSTEM_RESERVE_PROXY"
             }
-        ]
+        ],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1749785400,
     "startTimeStamp": 1747366200
