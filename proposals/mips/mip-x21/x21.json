@@ -253,28 +253,17 @@
         ],
         "multiRewarder": [
             {
-                "addRewards": [
-                    {
-                        "distributor": "USDC_MULTI_REWARDER",
-                        "duration": 2419200,
-                        "rewardToken": "WELL"
-                    },
-                    {
-                        "distributor": "USDC_MULTI_REWARDER",
-                        "duration": 2419200,
-                        "rewardToken": "OP"
-                    }
-                ],
-                "notifyRewardAmount": [
-                    {
-                        "reward": 1.5679577577634004e23,
-                        "rewardToken": "WELL"
-                    },
-                    {
-                        "reward": 1e22,
-                        "rewardToken": "OP"
-                    }
-                ],
+                "distributor": "USDC_MULTI_REWARDER",
+                "duration": 2419200,
+                "reward": 1.5679577577634004e23,
+                "rewardToken": "WELL",
+                "vault": "USDC_METAMORPHO_VAULT"
+            },
+            {
+                "distributor": "USDC_MULTI_REWARDER",
+                "duration": 2419200,
+                "reward": 1e22,
+                "rewardToken": "OP",
                 "vault": "USDC_METAMORPHO_VAULT"
             }
         ]

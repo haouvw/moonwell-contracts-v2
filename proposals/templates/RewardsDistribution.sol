@@ -86,20 +86,11 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         int256 newSupplySpeed;
     }
 
-    struct AddReward {
+    struct MultiRewarder {
         string distributor;
         uint256 duration;
-        string rewardToken;
-    }
-
-    struct NotifyRewardAmount {
         uint256 reward;
         string rewardToken;
-    }
-
-    struct MultiRewarder {
-        AddReward[] addRewards;
-        NotifyRewardAmount[] notifyRewardAmount;
         string vault;
     }
 
@@ -802,65 +793,49 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
 
             externalChainActions[_chainId].initSale = initSale;
-
-
+        }
 }
 
-            // multiRewarder
-            bytes memory multiRewarderBytes = vm.parseJson(
-                data,
-                string.concat(prefix, ".multiRewarder")
-            );
-            MultiRewarder[] memory multiRewarders = abi.decode(
-                multiRewarderBytes,
-                (MultiRewarder[])
-            );
+        _processMultiRewarder(addresses, data, prefix, _chainId);
+    }
 
-            for (uint256 i = 0; i < multiRewarders.length; i++) {
+    function _processMultiRewarder(
+        Addresses addresses,
+        string memory data,
+        string memory prefix,
+        uint256 _chainId
+    ) private {
+        bytes memory multiRewarderBytes = vm.parseJson(
+            data,
+            string.concat(prefix, ".multiRewarder")
+        );
+        MultiRewarder[] memory multiRewarders = abi.decode(
+            multiRewarderBytes,
+            (MultiRewarder[])
+        );
+
+        for (uint256 i = 0; i < multiRewarders.length; i++) {
                 MultiRewarder memory multiRewarder = multiRewarders[i];
 
-                for (uint256 j = 0; j < multiRewarder.addRewards.length; j++) {
-                    // safety check duration is 4 weeks
-                    assertEq(
-                        multiRewarder.addRewards[j].duration,
-                        2419200,
-                        "MultiRewarder: duration must be 4 weeks"
-                    );
-
-                    // safety check reward token is WELL or OP
+                        // safety check duration is 4 weeks
+                        assertEq(
+                        multiRewarder.duration,
+                            2419200,
+                            "MultiRewarder: duration must be 4 weeks"
+                        );
+                        // safety check reward token is WELL or OP
                     address rewardToken = addresses.getAddress(
-                        multiRewarder.addRewards[j].rewardToken
+                        multiRewarder.rewardToken
                     );
-                    assertEq(
+                        assertEq(
                         rewardToken == addresses.getAddress("WELL"),
-                        rewardToken == addresses.getAddress("OP"),
-                        "MultiRewarder: reward token must be WELL or OP"
-                    );
+                            rewardToken == addresses.getAddress("OP"),
+                            "MultiRewarder: reward token must be WELL or OP"
+                        );
 
-                    externalChainActions[_chainId]
-                        .multiRewarder[i]
-                        .addRewards
-                        .push(multiRewarder.addRewards[j]);
-                }
-
-                for (
-                    uint256 j = 0;
-                    j < multiRewarder.notifyRewardAmount.length;
-                    j++
-                ) {
-                    // push notifyRewardAmount
-                    externalChainActions[_chainId]
-                        .multiRewarder[i]
-                        .notifyRewardAmount
-                        .push(multiRewarder.notifyRewardAmount[j]);
-                }
-
-                externalChainActions[_chainId]
-                    .multiRewarder[i]
-                    .vault = multiRewarder.vault;
+                externalChainActions[_chainId].multiRewarder.push(multiRewarder);
             }
         }
-    }
 
     function _buildMoonbeamActions(Addresses addresses) private {
         vm.selectFork(MOONBEAM_FORK_ID);
@@ -1298,14 +1273,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
             MultiRewarder memory multiRewarder = spec.multiRewarder[i];
 
-            for (uint256 j = 0; j < multiRewarder.addRewards.length; j++) {
-                AddReward memory addReward = multiRewarder.addRewards[j];
-                address distributor = addresses.getAddress(
-                    addReward.distributor
-                );
-                address rewardToken = addresses.getAddress(
-                    addReward.rewardToken
-                );
+            address distributor = addresses.getAddress(
+                multiRewarder.distributor
+            );
+            address rewardToken = addresses.getAddress(
+                multiRewarder.rewardToken
+            );
 
                 try IMultiRewards(distributor).rewardData(rewardToken) returns (
                     address,
@@ -1319,28 +1292,45 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 } catch {
                     // rewardData does not exist, call addReward
                     _pushAction(
-                        addresses.getAddress(addReward.distributor),
+                        addresses.getAddress(multiRewarder.distributor),
                         abi.encodeWithSignature(
                             "addReward(address,address,uint256)",
                             rewardToken,
                             distributor,
-                            addReward.duration
+                            multiRewarder.duration
                         ),
                         string.concat(
                             "Add reward for ",
                             vm.getLabel(rewardToken),
                             " on ",
-                            multiRewarder.addRewards[j].distributor,
+                            multiRewarder.distributor,
                             " with duration ",
-                            vm.toString(addReward.duration),
+                            vm.toString(multiRewarder.duration),
                             " on ",
-                            multiRewarder.addRewards[j].distributor
+                            multiRewarder.distributor
                         )
                     );
                 }
+
+                // Notify reward amount
+                _pushAction(
+                    distributor,
+                    abi.encodeWithSignature(
+                        "notifyRewardAmount(address,uint256)",
+                        rewardToken,
+                        multiRewarder.reward
+                    ),
+                    string.concat(
+                        "Notify reward amount of ",
+                        vm.toString(multiRewarder.reward),
+                        " for token ",
+                        multiRewarder.rewardToken,
+                        " on ",
+                        multiRewarder.distributor
+                    )
+                );
             }
         }
-    }
 
     function _validateMoonbeam(Addresses addresses) private {
         vm.selectFork(MOONBEAM_FORK_ID);
@@ -1785,38 +1775,32 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         }
 
         // Validate MultiRewarder configurations
-
         for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
             MultiRewarder memory rewarder = spec.multiRewarder[i];
             address vault = addresses.getAddress(rewarder.vault);
             IMultiRewards multiRewards = IMultiRewards(vault);
 
-            // Validate addRewards configurations
-            for (uint256 j = 0; j < rewarder.addRewards.length; j++) {
-                AddReward memory reward = rewarder.addRewards[j];
-
                 // Get reward data from the contract
                 (
                     address rewardsDistributor,
-                    uint256 rewardsDuration, // periodFinish
-                    // rewardRate
-                    ,
-                    ,
+                    uint256 rewardsDuration,
+                    uint256 periodFinish,
+                    uint256 rewardRate,
                     ,
 
                 ) = // rewardPerTokenStored
                     // lastUpdateTime
                     multiRewards.rewardData(
-                        addresses.getAddress(reward.rewardToken)
+                        addresses.getAddress(rewarder.rewardToken)
                     );
 
                 // Validate reward configuration
                 assertEq(
                     rewardsDistributor,
-                    addresses.getAddress(reward.distributor),
+                    addresses.getAddress(rewarder.distributor),
                     string.concat(
                         "Incorrect rewards distributor for token ",
-                        reward.rewardToken,
+                        rewarder.rewardToken,
                         " in vault ",
                         vm.getLabel(vault)
                     )
@@ -1824,52 +1808,30 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
                 assertEq(
                     rewardsDuration,
-                    reward.duration,
+                    rewarder.duration,
                     string.concat(
                         "Incorrect rewards duration for token ",
-                        reward.rewardToken,
+                        rewarder.rewardToken,
                         " in vault ",
                         vm.getLabel(vault)
                     )
                 );
-            }
 
-            // Validate notifyRewardAmount calls
-            for (uint256 j = 0; j < rewarder.notifyRewardAmount.length; j++) {
-                NotifyRewardAmount memory notification = rewarder
-                    .notifyRewardAmount[j];
+                // Calculate expected reward rate and validate
+                uint256 expectedRewardRate = rewarder.reward / rewardsDuration;
 
-                // Get reward data from the contract
-                (
-                    ,
-                    // rewardsDistributor
-                    uint256 rewardsDuration,
-                    uint256 periodFinish,
-                    uint256 rewardRate, // lastUpdateTime
-                    ,
-
-                ) = // rewardPerTokenStored
-                    multiRewards.rewardData(
-                        addresses.getAddress(notification.rewardToken)
-                    );
-                {
-                    // Calculate expected reward rate
-                    uint256 expectedRewardRate = notification.reward /
-                        rewardsDuration;
-
-                    // Validate reward rate
-                    assertApproxEqRel(
-                        rewardRate,
-                        expectedRewardRate,
-                        0.01e18, // 1% tolerance for small rounding differences
-                        string.concat(
-                            "Incorrect reward rate for token ",
-                            notification.rewardToken,
-                            " in vault ",
-                            vm.getLabel(vault)
-                        )
-                    );
-                }
+                // Validate reward rate
+                assertApproxEqRel(
+                    rewardRate,
+                    expectedRewardRate,
+                    0.01e18, // 1% tolerance for small rounding differences
+                    string.concat(
+                        "Incorrect reward rate for token ",
+                        rewarder.rewardToken,
+                        " in vault ",
+                        vm.getLabel(vault)
+                    )
+                );
 
                 // Validate period finish
                 assertGt(
@@ -1877,9 +1839,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     block.timestamp,
                     string.concat(
                         "Reward period should not be finished for token ",
-                        notification.rewardToken,
-                        " in vault ",
-                        vm.getLabel(vault)
+                        rewarder.rewardToken
                     )
                 );
 
@@ -1888,18 +1848,15 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 remainingRewards = rewardRate * remainingTime;
                 assertApproxEqRel(
                     remainingRewards,
-                    notification.reward,
+                    rewarder.reward,
                     0.01e18, // 1% tolerance
                     string.concat(
                         "Incorrect remaining rewards for token ",
-                        notification.rewardToken,
-                        " in vault ",
-                        vm.getLabel(vault)
+                        rewarder.rewardToken
                     )
                 );
             }
         }
-    }
 
     function _validateTransferDestination(
         string memory destination
