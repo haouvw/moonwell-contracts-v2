@@ -87,14 +87,14 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
     }
 
     struct AddReward {
-        address distributor;
+        string distributor;
         uint256 duration;
-        address rewardToken;
+        string rewardToken;
     }
 
     struct NotifyRewardAmount {
         uint256 reward;
-        address rewardToken;
+        string rewardToken;
     }
 
     struct MultiRewarder {
@@ -497,30 +497,36 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         string memory data,
         uint256 _chainId
     ) private {
-        string memory chain = string.concat(".", vm.toString(_chainId));
+        string memory prefix = string.concat(".", vm.toString(_chainId));
 
-        bytes memory parsedJson = vm.parseJson(data, chain);
-
-        JsonSpecExternalChain memory spec = abi.decode(
-            parsedJson,
-            (JsonSpecExternalChain)
+        int256 stkWellEmissionsPerSecond = vm.parseJsonInt(
+            data,
+            string.concat(prefix, ".stkWellEmissionsPerSecond")
         );
-
-        if (spec.stkWellEmissionsPerSecond != -1) {
+        if (stkWellEmissionsPerSecond != -1) {
             assertLe(
-                spec.stkWellEmissionsPerSecond,
+                stkWellEmissionsPerSecond,
                 10e18,
                 "stkWellEmissionsPerSecond must be less than 10e18"
             );
 
-            externalChainActions[_chainId].stkWellEmissionsPerSecond = spec
-                .stkWellEmissionsPerSecond;
+            externalChainActions[_chainId]
+                .stkWellEmissionsPerSecond = stkWellEmissionsPerSecond;
         }
 
         uint256 totalWellEpochRewards = 0;
         uint256 totalOpEpochRewards = 0;
 
-        for (uint256 i = 0; i < spec.setRewardSpeed.length; i++) {
+        bytes memory setRewardSpeedsBytes = vm.parseJson(
+            data,
+            string.concat(prefix, ".setMRDSpeeds")
+        );
+        SetMRDRewardSpeed[] memory setRewardSpeeds = abi.decode(
+            setRewardSpeedsBytes,
+            (SetMRDRewardSpeed[])
+        );
+
+        for (uint256 i = 0; i < setRewardSpeeds.length; i++) {
             // check for duplications
             for (
                 uint256 j = 0;
@@ -534,29 +540,29 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
                 require(
                     addresses.getAddress(existingSetRewardSpeed.market) !=
-                        addresses.getAddress(spec.setRewardSpeed[i].market) ||
+                        addresses.getAddress(setRewardSpeeds[i].market) ||
                         addresses.getAddress(
                             existingSetRewardSpeed.emissionToken
                         ) !=
-                        addresses.getAddress(
-                            spec.setRewardSpeed[i].emissionToken
-                        ),
+                        addresses.getAddress(setRewardSpeeds[i].emissionToken),
                     "Duplication in setRewardSpeeds"
                 );
             }
 
-            if (spec.setRewardSpeed[i].newBorrowSpeed != -1) {
+            int256 supplySpeed = setRewardSpeeds[i].newSupplySpeed;
+            int256 borrowSpeed = setRewardSpeeds[i].newBorrowSpeed;
+
+            if (borrowSpeed != -1) {
                 assertGe(
-                    spec.setRewardSpeed[i].newBorrowSpeed,
+                    borrowSpeed,
                     1,
                     "Borrow speed must be greater or equal to 1"
                 );
             }
 
-            int256 supplySpeed = spec.setRewardSpeed[i].newSupplySpeed;
-            int256 borrowSpeed = spec.setRewardSpeed[i].newBorrowSpeed;
+            uint256 endTime = uint256(setRewardSpeeds[i].newEndTime);
             if (
-                addresses.getAddress(spec.setRewardSpeed[i].emissionToken) ==
+                addresses.getAddress(setRewardSpeeds[i].emissionToken) ==
                 addresses.getAddress("xWELL_PROXY")
             ) {
                 assertLe(
@@ -566,15 +572,11 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 );
 
                 uint256 supplyAmount = supplySpeed != int256(-1)
-                    ? uint256(supplySpeed) *
-                        (uint256(spec.setRewardSpeed[i].newEndTime) -
-                            startTimeStamp)
+                    ? uint256(supplySpeed) * (endTime - startTimeStamp)
                     : 0;
 
                 uint256 borrowAmount = borrowSpeed != int256(-1)
-                    ? (uint256(borrowSpeed) *
-                        (uint256(spec.setRewardSpeed[i].newEndTime) -
-                            startTimeStamp))
+                    ? (uint256(borrowSpeed) * (endTime - startTimeStamp))
                     : 0;
 
                 totalWellEpochRewards += supplyAmount + borrowAmount;
@@ -583,133 +585,155 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             // TODO add USDC assertion in the future
             if (
                 chainId == OPTIMISM_CHAIN_ID &&
-                addresses.getAddress(spec.setRewardSpeed[i].emissionToken) ==
+                addresses.getAddress(setRewardSpeeds[i].emissionToken) ==
                 addresses.getAddress("OP", OPTIMISM_CHAIN_ID)
             ) {
                 uint256 supplyAmount = supplySpeed != int256(-1)
-                    ? uint256(supplySpeed) *
-                        (uint256(spec.setRewardSpeed[i].newEndTime) -
-                            startTimeStamp)
+                    ? uint256(supplySpeed) * (endTime - startTimeStamp)
                     : 0;
 
                 uint256 borrowAmount = borrowSpeed != int256(-1)
-                    ? (uint256(borrowSpeed) *
-                        (uint256(spec.setRewardSpeed[i].newEndTime) -
-                            startTimeStamp))
+                    ? (uint256(borrowSpeed) * (endTime - startTimeStamp))
                     : 0;
 
                 totalOpEpochRewards += supplyAmount + borrowAmount;
             }
 
             externalChainActions[_chainId].setRewardSpeed.push(
-                spec.setRewardSpeed[i]
+                setRewardSpeeds[i]
             );
         }
-
         uint256 ecosystemReserveProxyAmount = 0;
-        for (uint256 i = 0; i < spec.transferFroms.length; i++) {
-            if (
-                addresses.getAddress(spec.transferFroms[i].to) ==
-                addresses.getAddress("MRD_PROXY") &&
-                addresses.getAddress(spec.transferFroms[i].from) ==
-                addresses.getAddress("TEMPORAL_GOVERNOR") &&
-                addresses.getAddress(spec.transferFroms[i].token) ==
-                addresses.getAddress("xWELL_PROXY")
-            ) {
-                assertApproxEqRel(
-                    spec.transferFroms[i].amount,
-                    totalWellEpochRewards,
-                    0.1e18,
-                    "Transfer amount must be close to the total rewards for the epoch"
-                );
-            }
-
-            // check OP
-            if (
-                chainId == OPTIMISM_CHAIN_ID &&
-                addresses.getAddress(spec.transferFroms[i].to) ==
-                addresses.getAddress("MRD_PROXY") &&
-                addresses.getAddress(spec.transferFroms[i].from) ==
-                addresses.getAddress(
-                    "FOUNDATION_OP_MULTISIG",
-                    OPTIMISM_CHAIN_ID
-                ) &&
-                addresses.getAddress(spec.transferFroms[i].token) ==
-                addresses.getAddress("OP", OPTIMISM_CHAIN_ID)
-            ) {
-                assertApproxEqRel(
-                    spec.transferFroms[i].amount,
-                    totalOpEpochRewards,
-                    0.01e18,
-                    "Transfer amount must be close to the total rewards for the epoch"
-                );
-            }
-
-            // check for duplications
-            for (
-                uint256 j = 0;
-                j < externalChainActions[_chainId].transferFroms.length;
-                j++
-            ) {
-                TransferFrom memory existingTransferFrom = externalChainActions[
-                    _chainId
-                ].transferFroms[j];
-
-                _validateTransferDestination(existingTransferFrom.to);
-            }
-
-            if (
-                addresses.getAddress(spec.transferFroms[i].to) ==
-                addresses.getAddress("ECOSYSTEM_RESERVE_PROXY")
-            ) {
-                ecosystemReserveProxyAmount += spec.transferFroms[i].amount;
-            }
-
-            externalChainActions[_chainId].transferFroms.push(
-                spec.transferFroms[i]
+        {
+            bytes memory transferFromsBytes = vm.parseJson(
+                data,
+                string.concat(prefix, ".transferFrom")
             );
+            TransferFrom[] memory transferFroms = abi.decode(
+                transferFromsBytes,
+                (TransferFrom[])
+            );
+
+            for (uint256 i = 0; i < transferFroms.length; i++) {
+                if (
+                    addresses.getAddress(transferFroms[i].to) ==
+                    addresses.getAddress("MRD_PROXY") &&
+                    addresses.getAddress(transferFroms[i].from) ==
+                    addresses.getAddress("TEMPORAL_GOVERNOR") &&
+                    addresses.getAddress(transferFroms[i].token) ==
+                    addresses.getAddress("xWELL_PROXY")
+                ) {
+                    assertApproxEqRel(
+                        transferFroms[i].amount,
+                        totalWellEpochRewards,
+                        0.1e18,
+                        "Transfer amount must be close to the total rewards for the epoch"
+                    );
+                }
+
+                // check OP
+                if (
+                    chainId == OPTIMISM_CHAIN_ID &&
+                    addresses.getAddress(transferFroms[i].to) ==
+                    addresses.getAddress("MRD_PROXY") &&
+                    addresses.getAddress(transferFroms[i].from) ==
+                    addresses.getAddress(
+                        "FOUNDATION_OP_MULTISIG",
+                        OPTIMISM_CHAIN_ID
+                    ) &&
+                    addresses.getAddress(transferFroms[i].token) ==
+                    addresses.getAddress("OP", OPTIMISM_CHAIN_ID)
+                ) {
+                    assertApproxEqRel(
+                        transferFroms[i].amount,
+                        totalOpEpochRewards,
+                        0.01e18,
+                        "Transfer amount must be close to the total rewards for the epoch"
+                    );
+                }
+
+                // check for duplications
+                for (uint256 j = 0; j < transferFroms.length; j++) {
+                    TransferFrom memory existingTransferFrom = transferFroms[j];
+
+                    _validateTransferDestination(existingTransferFrom.to);
+                }
+
+                if (
+                    addresses.getAddress(transferFroms[i].to) ==
+                    addresses.getAddress("ECOSYSTEM_RESERVE_PROXY")
+                ) {
+                    ecosystemReserveProxyAmount += transferFroms[i].amount;
+                }
+
+                externalChainActions[_chainId].transferFroms.push(
+                    transferFroms[i]
+                );
+            }
         }
 
-        for (uint256 i = 0; i < spec.withdrawWell.length; i++) {
-            WithdrawWell memory withdrawWell = spec.withdrawWell[i];
+        {
+            bytes memory withdrawWellsBytes = vm.parseJson(
+                data,
+                string.concat(prefix, ".withdrawWell")
+            );
+            WithdrawWell[] memory withdrawWells = abi.decode(
+                withdrawWellsBytes,
+                (WithdrawWell[])
+            );
 
-            _validateTransferDestination(withdrawWell.to);
+            for (uint256 i = 0; i < withdrawWells.length; i++) {
+                WithdrawWell memory withdrawWell = withdrawWells[i];
 
-            if (
-                addresses.getAddress(withdrawWell.to) ==
-                addresses.getAddress("ECOSYSTEM_RESERVE_PROXY")
-            ) {
-                console.log(ecosystemReserveProxyAmount);
-                ecosystemReserveProxyAmount += withdrawWell.amount;
-                console.log(ecosystemReserveProxyAmount);
+                _validateTransferDestination(withdrawWell.to);
+
+                if (
+                    addresses.getAddress(withdrawWell.to) ==
+                    addresses.getAddress("ECOSYSTEM_RESERVE_PROXY")
+                ) {
+                    ecosystemReserveProxyAmount += withdrawWell.amount;
+                }
+
+                externalChainActions[_chainId].withdrawWell.push(withdrawWell);
             }
 
-            externalChainActions[_chainId].withdrawWell.push(withdrawWell);
+            assertApproxEqRel(
+                int256(ecosystemReserveProxyAmount),
+                externalChainActions[_chainId].stkWellEmissionsPerSecond *
+                    int256(endTimeStamp - startTimeStamp),
+                1e18,
+                "Amount transferred to ECOSYSTEM_RESERVE_PROXY must be equal to the stkWellEmissionsPerSecond * the epoch duration"
+            );
+
+            bytes memory transferReservesBytes = vm.parseJson(
+                data,
+                string.concat(prefix, ".transferReserves")
+            );
+            TransferReserves[] memory transferReserves = abi.decode(
+                transferReservesBytes,
+                (TransferReserves[])
+            );
+
+            for (uint256 i = 0; i < transferReserves.length; i++) {
+                TransferReserves memory transferReserve = transferReserves[i];
+
+                externalChainActions[_chainId].transferReserves.push(
+                    transferReserve
+                );
+            }
         }
 
-        assertApproxEqRel(
-            int256(ecosystemReserveProxyAmount),
-            spec.stkWellEmissionsPerSecond *
-                int256(endTimeStamp - startTimeStamp),
-            1e18,
-            "Amount transferred to ECOSYSTEM_RESERVE_PROXY must be equal to the stkWellEmissionsPerSecond * the epoch duration"
+        bytes memory initSaleBytes = vm.parseJson(
+            data,
+            string.concat(prefix, ".initSale")
         );
-
-        for (uint256 i = 0; i < spec.transferReserves.length; i++) {
-            TransferReserves memory transferReserves = spec.transferReserves[i];
-
-            externalChainActions[_chainId].transferReserves.push(
-                transferReserves
-            );
-        }
+        InitSale memory initSale = abi.decode(initSaleBytes, (InitSale));
 
         // Process initSale if it exists in the JSON and has valid data
         if (
-            spec.initSale.auctionPeriod != 0 ||
-            spec.initSale.reserveAutomationContracts.length > 0
+            initSale.auctionPeriod != 0 ||
+            initSale.reserveAutomationContracts.length > 0
         ) {
-            InitSale memory initSale = spec.initSale;
-
             for (
                 uint256 i = 0;
                 i < initSale.reserveAutomationContracts.length;
@@ -765,36 +789,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
 
             externalChainActions[_chainId].initSale = initSale;
-        }
-
-        // Save MultiRewarder configuration to storage
-        for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
-            MultiRewarder storage newRewarder = externalChainActions[_chainId]
-                .multiRewarder
-                .push();
-            newRewarder.vault = spec.multiRewarder[i].vault;
-
-            // Copy addRewards array elements one by one
-            for (
-                uint256 j = 0;
-                j < spec.multiRewarder[i].addRewards.length;
-                j++
-            ) {
-                AddReward memory reward = spec.multiRewarder[i].addRewards[j];
-                newRewarder.addRewards.push(reward);
-            }
-
-            // Copy notifyRewardAmount array elements one by one
-            for (
-                uint256 j = 0;
-                j < spec.multiRewarder[i].notifyRewardAmount.length;
-                j++
-            ) {
-                NotifyRewardAmount memory notification = spec
-                    .multiRewarder[i]
-                    .notifyRewardAmount[j];
-                newRewarder.notifyRewardAmount.push(notification);
-            }
         }
     }
 
@@ -1230,117 +1224,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 );
             }
         }
-
-        // Add MultiRewarder configuration
-        for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
-            MultiRewarder memory rewarder = spec.multiRewarder[i];
-            address vault = addresses.getAddress(rewarder.vault);
-            IMultiRewards multiRewards = IMultiRewards(vault);
-
-            // Validate addRewards configurations
-            for (uint256 j = 0; j < rewarder.addRewards.length; j++) {
-                AddReward memory reward = rewarder.addRewards[j];
-
-                // Get reward data from the contract
-                (
-                    address rewardsDistributor,
-                    uint256 rewardsDuration, // periodFinish
-                    // rewardRate
-                    ,
-                    ,
-                    ,
-
-                ) = // rewardPerTokenStored
-                    // lastUpdateTime
-                    multiRewards.rewardData(reward.rewardToken);
-
-                // Validate reward configuration
-                assertEq(
-                    rewardsDistributor,
-                    reward.distributor,
-                    string.concat(
-                        "Incorrect rewards distributor for token ",
-                        vm.getLabel(reward.rewardToken),
-                        " in vault ",
-                        vm.getLabel(vault)
-                    )
-                );
-
-                assertEq(
-                    rewardsDuration,
-                    reward.duration,
-                    string.concat(
-                        "Incorrect rewards duration for token ",
-                        vm.getLabel(reward.rewardToken),
-                        " in vault ",
-                        vm.getLabel(vault)
-                    )
-                );
-            }
-
-            // Validate notifyRewardAmount calls
-            for (uint256 j = 0; j < rewarder.notifyRewardAmount.length; j++) {
-                NotifyRewardAmount memory notification = rewarder
-                    .notifyRewardAmount[j];
-
-                // Get reward data from the contract
-                (
-                    ,
-                    // rewardsDistributor
-                    uint256 rewardsDuration,
-                    uint256 periodFinish,
-                    uint256 rewardRate, // lastUpdateTime
-                    ,
-
-                ) = // rewardPerTokenStored
-                    multiRewards.rewardData(notification.rewardToken);
-                {
-                    // Calculate expected reward rate
-                    uint256 expectedRewardRate = notification.reward /
-                        rewardsDuration;
-
-                    // Validate reward rate
-                    assertApproxEqRel(
-                        rewardRate,
-                        expectedRewardRate,
-                        0.01e18, // 1% tolerance for small rounding differences
-                        string.concat(
-                            "Incorrect reward rate for token ",
-                            vm.getLabel(notification.rewardToken),
-                            " in vault ",
-                            vm.getLabel(vault)
-                        )
-                    );
-                }
-
-                // Validate period finish
-                assertGt(
-                    periodFinish,
-                    block.timestamp,
-                    string.concat(
-                        "Reward period should not be finished for token ",
-                        vm.getLabel(notification.rewardToken),
-                        " in vault ",
-                        vm.getLabel(vault)
-                    )
-                );
-
-                // Validate total reward amount using the actual reward rate
-                uint256 remainingTime = periodFinish - block.timestamp;
-                uint256 remainingRewards = rewardRate * remainingTime;
-                assertApproxEqRel(
-                    remainingRewards,
-                    notification.reward,
-                    0.01e18, // 1% tolerance
-                    string.concat(
-                        "Incorrect remaining rewards for token ",
-                        vm.getLabel(notification.rewardToken),
-                        " in vault ",
-                        vm.getLabel(vault)
-                    )
-                );
-            }
-        }
     }
 
     function _validateMoonbeam(Addresses addresses) private {
@@ -1546,141 +1429,159 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
         // Validate that each reserveAutomationContract has been properly initialized
         if (spec.initSale.reserveAutomationContracts.length > 0) {
-            for (
-                uint256 i = 0;
-                i < spec.initSale.reserveAutomationContracts.length;
-                i++
-            ) {
-                address reserveAutomationContract = addresses.getAddress(
-                    spec.initSale.reserveAutomationContracts[i]
-                );
+            {
+                for (
+                    uint256 i = 0;
+                    i < spec.initSale.reserveAutomationContracts.length;
+                    i++
+                ) {
+                    address reserveAutomationContract = addresses.getAddress(
+                        spec.initSale.reserveAutomationContracts[i]
+                    );
 
-                ReserveAutomation automation = ReserveAutomation(
-                    reserveAutomationContract
-                );
-
-                // Check that periodSaleAmount is set and greater than 0
-                assertGt(
-                    automation.periodSaleAmount(),
-                    0,
-                    "ReserveAutomation: periodSaleAmount not initialized"
-                );
-
-                // Check that saleStartTime is set to a future timestamp
-                assertGt(
-                    automation.saleStartTime(),
-                    block.timestamp,
-                    "ReserveAutomation: saleStartTime not initialized or in the past"
-                );
-
-                // Check that saleWindow matches the auction period
-                assertEq(
-                    automation.saleWindow(),
-                    spec.initSale.auctionPeriod,
-                    "ReserveAutomation: saleWindow not initialized correctly"
-                );
-
-                // Check that miniAuctionPeriod is set correctly
-                assertEq(
-                    automation.miniAuctionPeriod(),
-                    spec.initSale.miniAuctionPeriod,
-                    "ReserveAutomation: miniAuctionPeriod not initialized correctly"
-                );
-
-                // Verify auction period is divisible by mini auction period
-                assertEq(
-                    automation.saleWindow() % automation.miniAuctionPeriod(),
-                    0,
-                    "ReserveAutomation: auction period not divisible by mini auction period"
-                );
-
-                // Get the reserve asset token
-                address reserveAssetToken = automation.reserveAsset();
-                IERC20 reserveAsset = IERC20(reserveAssetToken);
-
-                // Verify the contract has the expected amount of reserves
-                uint256 actualReserves = reserveAsset.balanceOf(
-                    reserveAutomationContract
-                );
-
-                // Check that the balance has increased by the expected amount
-                uint256 balanceIncrease = actualReserves -
-                    reserveAutomationBalancesBefore[reserveAutomationContract];
-
-                // Verify that the reserves match any transferReserves operation targeting this contract
-                for (uint256 j = 0; j < spec.transferReserves.length; j++) {
-                    if (
-                        addresses.getAddress(spec.transferReserves[j].to) ==
+                    ReserveAutomation automation = ReserveAutomation(
                         reserveAutomationContract
-                    ) {
-                        assertApproxEqRel(
-                            balanceIncrease,
-                            spec.transferReserves[j].amount,
-                            0.01e18,
-                            "ReserveAutomation: reserves do not match transferReserves amount"
-                        );
+                    );
+
+                    // Check that periodSaleAmount is set and greater than 0
+                    assertGt(
+                        automation.periodSaleAmount(),
+                        0,
+                        "ReserveAutomation: periodSaleAmount not initialized"
+                    );
+
+                    // Check that saleStartTime is set to a future timestamp
+                    assertGt(
+                        automation.saleStartTime(),
+                        block.timestamp,
+                        "ReserveAutomation: saleStartTime not initialized or in the past"
+                    );
+
+                    // Check that saleWindow matches the auction period
+                    assertEq(
+                        automation.saleWindow(),
+                        spec.initSale.auctionPeriod,
+                        "ReserveAutomation: saleWindow not initialized correctly"
+                    );
+
+                    // Check that miniAuctionPeriod is set correctly
+                    assertEq(
+                        automation.miniAuctionPeriod(),
+                        spec.initSale.miniAuctionPeriod,
+                        "ReserveAutomation: miniAuctionPeriod not initialized correctly"
+                    );
+
+                    // Verify auction period is divisible by mini auction period
+                    assertEq(
+                        automation.saleWindow() %
+                            automation.miniAuctionPeriod(),
+                        0,
+                        "ReserveAutomation: auction period not divisible by mini auction period"
+                    );
+
+                    // Get the reserve asset token
+                    address reserveAssetToken = automation.reserveAsset();
+                    IERC20 reserveAsset = IERC20(reserveAssetToken);
+
+                    // Verify the contract has the expected amount of reserves
+                    uint256 actualReserves = reserveAsset.balanceOf(
+                        reserveAutomationContract
+                    );
+
+                    // Check that the balance has increased by the expected amount
+                    uint256 balanceIncrease = actualReserves -
+                        reserveAutomationBalancesBefore[
+                            reserveAutomationContract
+                        ];
+
+                    // Verify that the reserves match any transferReserves operation targeting this contract
+                    for (uint256 j = 0; j < spec.transferReserves.length; j++) {
+                        if (
+                            addresses.getAddress(spec.transferReserves[j].to) ==
+                            reserveAutomationContract
+                        ) {
+                            assertApproxEqRel(
+                                balanceIncrease,
+                                spec.transferReserves[j].amount,
+                                0.01e18,
+                                "ReserveAutomation: reserves do not match transferReserves amount"
+                            );
+                        }
                     }
                 }
             }
         }
 
         // Check balances for transferFroms
-        for (uint256 i = 0; i < spec.transferFroms.length; i++) {
-            address to = addresses.getAddress(spec.transferFroms[i].to);
-            address token = addresses.getAddress(spec.transferFroms[i].token);
+        {
+            for (uint256 i = 0; i < spec.transferFroms.length; i++) {
+                address to = addresses.getAddress(spec.transferFroms[i].to);
+                address token = addresses.getAddress(
+                    spec.transferFroms[i].token
+                );
 
-            if (token == addresses.getAddress("xWELL_PROXY")) {
-                if (to == addresses.getAddress("ECOSYSTEM_RESERVE_PROXY")) {
-                    // For ECOSYSTEM_RESERVE_PROXY, we need to account for both transferFroms and withdrawWell
-                    uint256 totalAmount = spec.transferFroms[i].amount;
+                if (token == addresses.getAddress("xWELL_PROXY")) {
+                    if (to == addresses.getAddress("ECOSYSTEM_RESERVE_PROXY")) {
+                        // For ECOSYSTEM_RESERVE_PROXY, we need to account for both transferFroms and withdrawWell
+                        uint256 totalAmount = spec.transferFroms[i].amount;
 
-                    // Add any withdrawWell amounts to the same recipient
-                    for (uint256 j = 0; j < spec.withdrawWell.length; j++) {
-                        if (
-                            addresses.getAddress(spec.withdrawWell[j].to) == to
-                        ) {
-                            totalAmount += spec.withdrawWell[j].amount;
+                        // Add any withdrawWell amounts to the same recipient
+                        for (uint256 j = 0; j < spec.withdrawWell.length; j++) {
+                            if (
+                                addresses.getAddress(spec.withdrawWell[j].to) ==
+                                to
+                            ) {
+                                totalAmount += spec.withdrawWell[j].amount;
+                            }
                         }
-                    }
 
-                    assertEq(
-                        IERC20(token).balanceOf(to),
-                        wellBalancesBefore[to] + totalAmount,
-                        string.concat("balance wrong for ", vm.getLabel(to))
-                    );
-                } else {
-                    assertEq(
-                        IERC20(token).balanceOf(to),
-                        wellBalancesBefore[to] + spec.transferFroms[i].amount,
-                        string.concat("balance changed for ", vm.getLabel(to))
-                    );
+                        assertEq(
+                            IERC20(token).balanceOf(to),
+                            wellBalancesBefore[to] + totalAmount,
+                            string.concat("balance wrong for ", vm.getLabel(to))
+                        );
+                    } else {
+                        assertEq(
+                            IERC20(token).balanceOf(to),
+                            wellBalancesBefore[to] +
+                                spec.transferFroms[i].amount,
+                            string.concat(
+                                "balance changed for ",
+                                vm.getLabel(to)
+                            )
+                        );
+                    }
                 }
             }
         }
 
         // Check balances for withdrawWell operations that don't have a corresponding transferFrom
-        for (uint256 i = 0; i < spec.withdrawWell.length; i++) {
-            address to = addresses.getAddress(spec.withdrawWell[i].to);
+        {
+            for (uint256 i = 0; i < spec.withdrawWell.length; i++) {
+                address to = addresses.getAddress(spec.withdrawWell[i].to);
 
-            // Skip if this recipient was already checked in the transferFroms loop
-            bool alreadyChecked = false;
-            for (uint256 j = 0; j < spec.transferFroms.length; j++) {
-                if (
-                    addresses.getAddress(spec.transferFroms[j].to) == to &&
-                    addresses.getAddress(spec.transferFroms[j].token) ==
-                    addresses.getAddress("xWELL_PROXY")
-                ) {
-                    alreadyChecked = true;
-                    break;
+                // Skip if this recipient was already checked in the transferFroms loop
+                bool alreadyChecked = false;
+                for (uint256 j = 0; j < spec.transferFroms.length; j++) {
+                    if (
+                        addresses.getAddress(spec.transferFroms[j].to) == to &&
+                        addresses.getAddress(spec.transferFroms[j].token) ==
+                        addresses.getAddress("xWELL_PROXY")
+                    ) {
+                        alreadyChecked = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!alreadyChecked) {
-                assertEq(
-                    IERC20(addresses.getAddress("xWELL_PROXY")).balanceOf(to),
-                    wellBalancesBefore[to] + spec.withdrawWell[i].amount,
-                    string.concat("balance wrong for ", vm.getLabel(to))
-                );
+                if (!alreadyChecked) {
+                    assertEq(
+                        IERC20(addresses.getAddress("xWELL_PROXY")).balanceOf(
+                            to
+                        ),
+                        wellBalancesBefore[to] + spec.withdrawWell[i].amount,
+                        string.concat("balance wrong for ", vm.getLabel(to))
+                    );
+                }
             }
         }
 
@@ -1699,70 +1600,76 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 "Emissions per second for the Safety Module is incorrect"
             );
         }
-        IMultiRewardDistributor distributor = IMultiRewardDistributor(
-            addresses.getAddress("MRD_PROXY")
-        );
 
-        // validate setRewardSpeed calls
-        for (uint256 i = 0; i < spec.setRewardSpeed.length; i++) {
-            SetMRDRewardSpeed memory setRewardSpeed = spec.setRewardSpeed[i];
+        {
+            IMultiRewardDistributor distributor = IMultiRewardDistributor(
+                addresses.getAddress("MRD_PROXY")
+            );
 
-            IMultiRewardDistributor.MarketConfig[]
-                memory _emissionConfigs = distributor.getAllMarketConfigs(
-                    MToken(addresses.getAddress(setRewardSpeed.market))
-                );
+            // validate setRewardSpeed calls
+            for (uint256 i = 0; i < spec.setRewardSpeed.length; i++) {
+                SetMRDRewardSpeed memory setRewardSpeed = spec.setRewardSpeed[
+                    i
+                ];
 
-            for (uint256 j = 0; j < _emissionConfigs.length; j++) {
-                IMultiRewardDistributor.MarketConfig
-                    memory _config = _emissionConfigs[j];
-                if (
-                    _config.emissionToken ==
-                    addresses.getAddress(setRewardSpeed.emissionToken)
-                ) {
-                    address market = addresses.getAddress(
-                        setRewardSpeed.market
+                IMultiRewardDistributor.MarketConfig[]
+                    memory _emissionConfigs = distributor.getAllMarketConfigs(
+                        MToken(addresses.getAddress(setRewardSpeed.market))
                     );
 
-                    if (setRewardSpeed.newSupplySpeed != -1) {
-                        assertEq(
-                            int256(_config.supplyEmissionsPerSec),
-                            setRewardSpeed.newSupplySpeed,
-                            string.concat(
-                                "Supply speed for ",
-                                vm.getLabel(market),
-                                " is incorrect"
-                            )
+                for (uint256 j = 0; j < _emissionConfigs.length; j++) {
+                    IMultiRewardDistributor.MarketConfig
+                        memory _config = _emissionConfigs[j];
+                    if (
+                        _config.emissionToken ==
+                        addresses.getAddress(setRewardSpeed.emissionToken)
+                    ) {
+                        address market = addresses.getAddress(
+                            setRewardSpeed.market
                         );
-                    }
 
-                    if (setRewardSpeed.newBorrowSpeed != -1) {
-                        assertEq(
-                            int256(_config.borrowEmissionsPerSec),
-                            setRewardSpeed.newBorrowSpeed,
-                            string.concat(
-                                "Borrow speed for ",
-                                vm.getLabel(market),
-                                " is incorrect"
-                            )
-                        );
-                    }
+                        if (setRewardSpeed.newSupplySpeed != -1) {
+                            assertEq(
+                                int256(_config.supplyEmissionsPerSec),
+                                setRewardSpeed.newSupplySpeed,
+                                string.concat(
+                                    "Supply speed for ",
+                                    vm.getLabel(market),
+                                    " is incorrect"
+                                )
+                            );
+                        }
 
-                    if (setRewardSpeed.newEndTime != -1) {
-                        assertEq(
-                            int256(_config.endTime),
-                            setRewardSpeed.newEndTime,
-                            string.concat(
-                                "End time for ",
-                                vm.getLabel(market),
-                                " is incorrect"
-                            )
-                        );
+                        if (setRewardSpeed.newBorrowSpeed != -1) {
+                            assertEq(
+                                int256(_config.borrowEmissionsPerSec),
+                                setRewardSpeed.newBorrowSpeed,
+                                string.concat(
+                                    "Borrow speed for ",
+                                    vm.getLabel(market),
+                                    " is incorrect"
+                                )
+                            );
+                        }
+
+                        if (setRewardSpeed.newEndTime != -1) {
+                            assertEq(
+                                int256(_config.endTime),
+                                setRewardSpeed.newEndTime,
+                                string.concat(
+                                    "End time for ",
+                                    vm.getLabel(market),
+                                    " is incorrect"
+                                )
+                            );
+                        }
                     }
                 }
             }
         }
 
         // Validate MultiRewarder configurations
+
         for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
             MultiRewarder memory rewarder = spec.multiRewarder[i];
             address vault = addresses.getAddress(rewarder.vault);
@@ -1776,22 +1683,24 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 (
                     address rewardsDistributor,
                     uint256 rewardsDuration, // periodFinish
-                    // rewardRate
+                    // rewardPerTokenStored
                     ,
                     ,
                     ,
 
-                ) = // rewardPerTokenStored
+                ) = // rewardRate
                     // lastUpdateTime
-                    multiRewards.rewardData(reward.rewardToken);
+                    multiRewards.rewardData(
+                        addresses.getAddress(reward.rewardToken)
+                    );
 
                 // Validate reward configuration
                 assertEq(
                     rewardsDistributor,
-                    reward.distributor,
+                    addresses.getAddress(reward.distributor),
                     string.concat(
                         "Incorrect rewards distributor for token ",
-                        vm.getLabel(reward.rewardToken),
+                        reward.rewardToken,
                         " in vault ",
                         vm.getLabel(vault)
                     )
@@ -1802,7 +1711,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     reward.duration,
                     string.concat(
                         "Incorrect rewards duration for token ",
-                        vm.getLabel(reward.rewardToken),
+                        reward.rewardToken,
                         " in vault ",
                         vm.getLabel(vault)
                     )
@@ -1821,10 +1730,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     uint256 rewardsDuration,
                     uint256 periodFinish,
                     uint256 rewardRate, // lastUpdateTime
+                    // rewardPerTokenStored
                     ,
 
-                ) = // rewardPerTokenStored
-                    multiRewards.rewardData(notification.rewardToken);
+                ) = multiRewards.rewardData(
+                        addresses.getAddress(notification.rewardToken)
+                    );
                 {
                     // Calculate expected reward rate
                     uint256 expectedRewardRate = notification.reward /
@@ -1837,7 +1748,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         0.01e18, // 1% tolerance for small rounding differences
                         string.concat(
                             "Incorrect reward rate for token ",
-                            vm.getLabel(notification.rewardToken),
+                            notification.rewardToken,
                             " in vault ",
                             vm.getLabel(vault)
                         )
@@ -1850,7 +1761,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     block.timestamp,
                     string.concat(
                         "Reward period should not be finished for token ",
-                        vm.getLabel(notification.rewardToken),
+                        notification.rewardToken,
                         " in vault ",
                         vm.getLabel(vault)
                     )
@@ -1865,7 +1776,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     0.01e18, // 1% tolerance
                     string.concat(
                         "Incorrect remaining rewards for token ",
-                        vm.getLabel(notification.rewardToken),
+                        notification.rewardToken,
                         " in vault ",
                         vm.getLabel(vault)
                     )
