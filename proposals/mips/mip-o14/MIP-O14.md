@@ -1,5 +1,7 @@
 # MIP-O14 Add USDT0 Martket to Moonwell on Optimism
 
+## Sumary
+
 I am pleased to present a proposal for the addition of USDT0, a multichain
 variant of Tether (USDT), to the Moonwell protocol’s Core lending markets. USDT0
 brings the stability and familiarity of Tether into an advanced cross-chain
@@ -268,3 +270,12 @@ In case this is not a satisfying answer, here’s some back-of-napkin math:
 
 - **Monthly Protocol Revenue:** ~$7,083  
   Equals $850,000 ÷ 12
+
+---
+
+## Voting Options
+
+- **Aye:** Approve the proposal to activate a MORPHO market on Moonwell (Base)
+  using Gauntlet's recommended initial risk parameters
+- **Nay:** Reject the proposal
+- **Abstain:** Abstain from voting
