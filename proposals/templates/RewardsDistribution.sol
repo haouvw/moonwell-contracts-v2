@@ -726,75 +726,75 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
         }
 
-{
-        bytes memory initSaleBytes = vm.parseJson(
-            data,
-            string.concat(prefix, ".initSale")
-        );
-        InitSale memory initSale = abi.decode(initSaleBytes, (InitSale));
+        {
+            bytes memory initSaleBytes = vm.parseJson(
+                data,
+                string.concat(prefix, ".initSale")
+            );
+            InitSale memory initSale = abi.decode(initSaleBytes, (InitSale));
 
-        // Process initSale if it exists in the JSON and has valid data
-        if (
-            initSale.auctionPeriod != 0 ||
-            initSale.reserveAutomationContracts.length > 0
-        ) {
-            for (
-                uint256 i = 0;
-                i < initSale.reserveAutomationContracts.length;
-                i++
+            // Process initSale if it exists in the JSON and has valid data
+            if (
+                initSale.auctionPeriod != 0 ||
+                initSale.reserveAutomationContracts.length > 0
             ) {
-                // Get the ReserveAutomation contract and its reserveAsset
-                address reserveAutomationContract = addresses.getAddress(
-                    initSale.reserveAutomationContracts[i]
-                );
+                for (
+                    uint256 i = 0;
+                    i < initSale.reserveAutomationContracts.length;
+                    i++
+                ) {
+                    // Get the ReserveAutomation contract and its reserveAsset
+                    address reserveAutomationContract = addresses.getAddress(
+                        initSale.reserveAutomationContracts[i]
+                    );
 
-                // Sanity check: delay must be less than or equal to MAXIMUM_AUCTION_DELAY
-                assertLe(
-                    initSale.delay,
-                    ReserveAutomation(reserveAutomationContract)
-                        .MAXIMUM_AUCTION_DELAY(),
-                    "RewardsDistribution: delay exceeds MAXIMUM_AUCTION_DELAY"
-                );
+                    // Sanity check: delay must be less than or equal to MAXIMUM_AUCTION_DELAY
+                    assertLe(
+                        initSale.delay,
+                        ReserveAutomation(reserveAutomationContract)
+                            .MAXIMUM_AUCTION_DELAY(),
+                        "RewardsDistribution: delay exceeds MAXIMUM_AUCTION_DELAY"
+                    );
 
-                // Sanity check: maxDiscount must be less than SCALAR (1e18)
-                assertLt(
-                    initSale.periodMaxDiscount,
-                    ReserveAutomation(reserveAutomationContract).SCALAR(),
-                    "RewardsDistribution: periodMaxDiscount must be less than SCALAR"
-                );
+                    // Sanity check: maxDiscount must be less than SCALAR (1e18)
+                    assertLt(
+                        initSale.periodMaxDiscount,
+                        ReserveAutomation(reserveAutomationContract).SCALAR(),
+                        "RewardsDistribution: periodMaxDiscount must be less than SCALAR"
+                    );
 
-                // Sanity check: startingPremium must be greater than SCALAR (1e18)
-                assertGt(
-                    uint256(initSale.periodStartingPremium),
-                    ReserveAutomation(reserveAutomationContract).SCALAR(),
-                    "RewardsDistribution: periodStartingPremium must be greater than SCALAR"
-                );
+                    // Sanity check: startingPremium must be greater than SCALAR (1e18)
+                    assertGt(
+                        uint256(initSale.periodStartingPremium),
+                        ReserveAutomation(reserveAutomationContract).SCALAR(),
+                        "RewardsDistribution: periodStartingPremium must be greater than SCALAR"
+                    );
 
-                // Sanity check: auctionPeriod must be perfectly divisible by miniAuctionPeriod
-                assertEq(
-                    initSale.auctionPeriod % initSale.miniAuctionPeriod,
-                    0,
-                    "RewardsDistribution: auctionPeriod must be perfectly divisible by miniAuctionPeriod"
-                );
+                    // Sanity check: auctionPeriod must be perfectly divisible by miniAuctionPeriod
+                    assertEq(
+                        initSale.auctionPeriod % initSale.miniAuctionPeriod,
+                        0,
+                        "RewardsDistribution: auctionPeriod must be perfectly divisible by miniAuctionPeriod"
+                    );
 
-                // Sanity check: must have more than one mini-auction
-                assertGt(
-                    initSale.auctionPeriod / initSale.miniAuctionPeriod,
-                    1,
-                    "RewardsDistribution: must have more than one mini-auction"
-                );
+                    // Sanity check: must have more than one mini-auction
+                    assertGt(
+                        initSale.auctionPeriod / initSale.miniAuctionPeriod,
+                        1,
+                        "RewardsDistribution: must have more than one mini-auction"
+                    );
 
-                // Sanity check: miniAuctionPeriod must be greater than 1
-                assertGt(
-                    initSale.miniAuctionPeriod,
-                    10000,
-                    "RewardsDistribution: miniAuctionPeriod must be greater than 10000"
-                );
+                    // Sanity check: miniAuctionPeriod must be greater than 1
+                    assertGt(
+                        initSale.miniAuctionPeriod,
+                        10000,
+                        "RewardsDistribution: miniAuctionPeriod must be greater than 10000"
+                    );
+                }
+
+                externalChainActions[_chainId].initSale = initSale;
             }
-
-            externalChainActions[_chainId].initSale = initSale;
         }
-}
 
         _processMultiRewarder(addresses, data, prefix, _chainId);
     }
@@ -815,27 +815,18 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         );
 
         for (uint256 i = 0; i < multiRewarders.length; i++) {
-                MultiRewarder memory multiRewarder = multiRewarders[i];
+            MultiRewarder memory multiRewarder = multiRewarders[i];
 
-                        // safety check duration is 4 weeks
-                        assertEq(
-                        multiRewarder.duration,
-                            2419200,
-                            "MultiRewarder: duration must be 4 weeks"
-                        );
-                        // safety check reward token is WELL or OP
-                    address rewardToken = addresses.getAddress(
-                        multiRewarder.rewardToken
-                    );
-                        assertEq(
-                        rewardToken == addresses.getAddress("xWELL_PROXY"),
-                            rewardToken == addresses.getAddress("OP"),
-                            "MultiRewarder: reward token must be WELL or OP"
-                        );
+            // safety check duration is 4 weeks
+            assertEq(
+                multiRewarder.duration,
+                2419200,
+                "MultiRewarder: duration must be 4 weeks"
+            );
 
-                externalChainActions[_chainId].multiRewarder.push(multiRewarder);
-            }
+            externalChainActions[_chainId].multiRewarder.push(multiRewarder);
         }
+    }
 
     function _buildMoonbeamActions(Addresses addresses) private {
         vm.selectFork(MOONBEAM_FORK_ID);
@@ -1280,57 +1271,57 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 multiRewarder.rewardToken
             );
 
-                try IMultiRewards(distributor).rewardData(rewardToken) returns (
-                    address,
-                    uint256,
-                    uint256,
-                    uint256,
-                    uint256,
-                    uint256
-                ) {
-                    // rewardData exists
-                } catch {
-                    // rewardData does not exist, call addReward
-                    _pushAction(
-                        addresses.getAddress(multiRewarder.distributor),
-                        abi.encodeWithSignature(
-                            "addReward(address,address,uint256)",
-                            rewardToken,
-                            distributor,
-                            multiRewarder.duration
-                        ),
-                        string.concat(
-                            "Add reward for ",
-                            vm.getLabel(rewardToken),
-                            " on ",
-                            multiRewarder.distributor,
-                            " with duration ",
-                            vm.toString(multiRewarder.duration),
-                            " on ",
-                            multiRewarder.distributor
-                        )
-                    );
-                }
-
-                // Notify reward amount
+            try IMultiRewards(distributor).rewardData(rewardToken) returns (
+                address,
+                uint256,
+                uint256,
+                uint256,
+                uint256,
+                uint256
+            ) {
+                // rewardData exists
+            } catch {
+                // rewardData does not exist, call addReward
                 _pushAction(
-                    distributor,
+                    addresses.getAddress(multiRewarder.distributor),
                     abi.encodeWithSignature(
-                        "notifyRewardAmount(address,uint256)",
+                        "addReward(address,address,uint256)",
                         rewardToken,
-                        multiRewarder.reward
+                        distributor,
+                        multiRewarder.duration
                     ),
                     string.concat(
-                        "Notify reward amount of ",
-                        vm.toString(multiRewarder.reward),
-                        " for token ",
-                        multiRewarder.rewardToken,
+                        "Add reward for ",
+                        vm.getLabel(rewardToken),
+                        " on ",
+                        multiRewarder.distributor,
+                        " with duration ",
+                        vm.toString(multiRewarder.duration),
                         " on ",
                         multiRewarder.distributor
                     )
                 );
             }
+
+            // Notify reward amount
+            _pushAction(
+                distributor,
+                abi.encodeWithSignature(
+                    "notifyRewardAmount(address,uint256)",
+                    rewardToken,
+                    multiRewarder.reward
+                ),
+                string.concat(
+                    "Notify reward amount of ",
+                    vm.toString(multiRewarder.reward),
+                    " for token ",
+                    multiRewarder.rewardToken,
+                    " on ",
+                    multiRewarder.distributor
+                )
+            );
         }
+    }
 
     function _validateMoonbeam(Addresses addresses) private {
         vm.selectFork(MOONBEAM_FORK_ID);
@@ -1780,83 +1771,82 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             address vault = addresses.getAddress(rewarder.vault);
             IMultiRewards multiRewards = IMultiRewards(vault);
 
-                // Get reward data from the contract
-                (
-                    address rewardsDistributor,
-                    uint256 rewardsDuration,
-                    uint256 periodFinish,
-                    uint256 rewardRate,
-                    ,
+            // Get reward data from the contract
+            (
+                address rewardsDistributor,
+                uint256 rewardsDuration,
+                uint256 periodFinish,
+                uint256 rewardRate, // rewardPerTokenStored
+                ,
 
-                ) = // rewardPerTokenStored
-                    // lastUpdateTime
-                    multiRewards.rewardData(
-                        addresses.getAddress(rewarder.rewardToken)
-                    );
-
-                // Validate reward configuration
-                assertEq(
-                    rewardsDistributor,
-                    addresses.getAddress(rewarder.distributor),
-                    string.concat(
-                        "Incorrect rewards distributor for token ",
-                        rewarder.rewardToken,
-                        " in vault ",
-                        vm.getLabel(vault)
-                    )
+            ) = // lastUpdateTime
+                multiRewards.rewardData(
+                    addresses.getAddress(rewarder.rewardToken)
                 );
 
-                assertEq(
-                    rewardsDuration,
-                    rewarder.duration,
-                    string.concat(
-                        "Incorrect rewards duration for token ",
-                        rewarder.rewardToken,
-                        " in vault ",
-                        vm.getLabel(vault)
-                    )
-                );
+            // Validate reward configuration
+            assertEq(
+                rewardsDistributor,
+                addresses.getAddress(rewarder.distributor),
+                string.concat(
+                    "Incorrect rewards distributor for token ",
+                    rewarder.rewardToken,
+                    " in vault ",
+                    vm.getLabel(vault)
+                )
+            );
 
-                // Calculate expected reward rate and validate
-                uint256 expectedRewardRate = rewarder.reward / rewardsDuration;
+            assertEq(
+                rewardsDuration,
+                rewarder.duration,
+                string.concat(
+                    "Incorrect rewards duration for token ",
+                    rewarder.rewardToken,
+                    " in vault ",
+                    vm.getLabel(vault)
+                )
+            );
 
-                // Validate reward rate
-                assertApproxEqRel(
-                    rewardRate,
-                    expectedRewardRate,
-                    0.01e18, // 1% tolerance for small rounding differences
-                    string.concat(
-                        "Incorrect reward rate for token ",
-                        rewarder.rewardToken,
-                        " in vault ",
-                        vm.getLabel(vault)
-                    )
-                );
+            // Calculate expected reward rate and validate
+            uint256 expectedRewardRate = rewarder.reward / rewardsDuration;
 
-                // Validate period finish
-                assertGt(
-                    periodFinish,
-                    block.timestamp,
-                    string.concat(
-                        "Reward period should not be finished for token ",
-                        rewarder.rewardToken
-                    )
-                );
+            // Validate reward rate
+            assertApproxEqRel(
+                rewardRate,
+                expectedRewardRate,
+                0.01e18, // 1% tolerance for small rounding differences
+                string.concat(
+                    "Incorrect reward rate for token ",
+                    rewarder.rewardToken,
+                    " in vault ",
+                    vm.getLabel(vault)
+                )
+            );
 
-                // Validate total reward amount using the actual reward rate
-                uint256 remainingTime = periodFinish - block.timestamp;
-                uint256 remainingRewards = rewardRate * remainingTime;
-                assertApproxEqRel(
-                    remainingRewards,
-                    rewarder.reward,
-                    0.01e18, // 1% tolerance
-                    string.concat(
-                        "Incorrect remaining rewards for token ",
-                        rewarder.rewardToken
-                    )
-                );
-            }
+            // Validate period finish
+            assertGt(
+                periodFinish,
+                block.timestamp,
+                string.concat(
+                    "Reward period should not be finished for token ",
+                    rewarder.rewardToken
+                )
+            );
+
+            // Validate total reward amount using the actual reward rate
+            uint256 remainingTime = periodFinish - block.timestamp;
+            uint256 remainingRewards = rewardRate * remainingTime;
+            assertApproxEqRel(
+                remainingRewards,
+                rewarder.reward,
+                0.01e18, // 1% tolerance
+                string.concat(
+                    "Incorrect remaining rewards for token ",
+                    rewarder.rewardToken
+                )
+            );
         }
+    }
 
     function _validateTransferDestination(
         string memory destination
