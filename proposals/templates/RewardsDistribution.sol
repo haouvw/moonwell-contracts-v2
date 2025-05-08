@@ -1292,7 +1292,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
             // Notify reward amount
             _pushAction(
-                distributor,
+                addresses.getAddress(multiRewarder.vault),
                 abi.encodeWithSignature(
                     "notifyRewardAmount(address,uint256)",
                     rewardToken,
@@ -1304,7 +1304,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     " for token ",
                     multiRewarder.rewardToken,
                     " on ",
-                    multiRewarder.distributor
+                    multiRewarder.vault
                 )
             );
         }
