@@ -11,7 +11,6 @@
                 "RESERVE_AUTOMATION_cbETH"
             ]
         },
-        "multiRewards": [],
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
@@ -370,7 +369,8 @@
             }
         ],
         "stkWellEmissionsPerSecond": 76225803858344030,
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "8453": {
         "initSale": {
@@ -669,7 +669,8 @@
                 "amount": 1.7444674492313098e24,
                 "to": "ECOSYSTEM_RESERVE_PROXY"
             }
-        ]
+        ],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1744947000,
     "startTimeStamp": 1742527800
