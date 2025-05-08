@@ -1,4 +1,4 @@
-## Summary
+# MIP-O14 Add USDT0 Martket to Moonwell on Optimism
 
 I am pleased to present a proposal for the addition of USDT0, a multichain
 variant of Tether (USDT), to the Moonwell protocol’s Core lending markets. USDT0
