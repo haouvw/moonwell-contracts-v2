@@ -807,13 +807,13 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 data,
                 string.concat(prefix, ".multiRewarder")
             );
-            MultiRewarder[] memory multiRewarder = abi.decode(
+            MultiRewarder[] memory multiRewarders = abi.decode(
                 multiRewarderBytes,
                 (MultiRewarder[])
             );
 
-            for (uint256 i = 0; i < multiRewarder.length; i++) {
-                MultiRewarder memory multiRewarder = multiRewarder[i];
+            for (uint256 i = 0; i < multiRewarders.length; i++) {
+                MultiRewarder memory multiRewarder = multiRewarders[i];
 
                 for (uint256 j = 0; j < multiRewarder.addRewards.length; j++) {
                     // safety check duration is 4 weeks
@@ -827,16 +827,16 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     address rewardToken = addresses.getAddress(
                         multiRewarder.addRewards[j].rewardToken
                     );
-                    assertOr(
+                    assertEq(
                         rewardToken == addresses.getAddress("WELL"),
                         rewardToken == addresses.getAddress("OP"),
                         "MultiRewarder: reward token must be WELL or OP"
                     );
 
-                    // push addRewards
-                    externalChainActions[_chainId].addRewards.push(
-                        multiRewarder.addRewards[j]
-                    );
+                    externalChainActions[_chainId]
+                        .multiRewarder[i]
+                        .addRewards
+                        .push(multiRewarder.addRewards[j]);
                 }
 
                 for (
@@ -845,13 +845,14 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     j++
                 ) {
                     // push notifyRewardAmount
-                    externalChainActions[_chainId].notifyRewardAmount.push(
-                        multiRewarder.notifyRewardAmount[j]
-                    );
+                    externalChainActions[_chainId]
+                        .multiRewarder[i]
+                        .notifyRewardAmount
+                        .push(multiRewarder.notifyRewardAmount[j]);
                 }
 
                 externalChainActions[_chainId]
-                    .multiRewarder
+                    .multiRewarder[i]
                     .vault = multiRewarder.vault;
             }
         }
@@ -1794,12 +1795,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 (
                     address rewardsDistributor,
                     uint256 rewardsDuration, // periodFinish
-                    // rewardPerTokenStored
+                    // rewardRate
                     ,
                     ,
                     ,
 
-                ) = // rewardRate
+                ) = // rewardPerTokenStored
                     // lastUpdateTime
                     multiRewards.rewardData(
                         addresses.getAddress(reward.rewardToken)
@@ -1841,10 +1842,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     uint256 rewardsDuration,
                     uint256 periodFinish,
                     uint256 rewardRate, // lastUpdateTime
-                    // rewardPerTokenStored
                     ,
 
-                ) = multiRewards.rewardData(
+                ) = // rewardPerTokenStored
+                    multiRewards.rewardData(
                         addresses.getAddress(notification.rewardToken)
                     );
                 {
