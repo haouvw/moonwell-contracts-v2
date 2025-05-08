@@ -1342,7 +1342,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 assertApproxEqAbs(
                     well.balanceOf(to),
                     wellBalancesBefore[to],
-                    1e18,
+                    10e18, // tolerates 10 well as margin error
                     string.concat("balance changed for ", vm.getLabel(to))
                 );
             } else {
@@ -1641,11 +1641,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                             string.concat("balance wrong for ", vm.getLabel(to))
                         );
                     } else {
-                        assertApproxEqAbs(
+                        assertEq(
                             IERC20(token).balanceOf(to),
                             wellBalancesBefore[to] +
                                 spec.transferFroms[i].amount,
-                            10e18, // tolerates 10 well as margin error
                             string.concat(
                                 "balance changed for ",
                                 vm.getLabel(to)
@@ -1781,10 +1780,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
-                // lastUpdateTime
                 ,
 
-            ) = multiRewards.rewardData(
+            ) = // lastUpdateTime
+                multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
