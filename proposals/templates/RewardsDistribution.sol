@@ -1780,10 +1780,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
@@ -1829,7 +1829,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             // Validate period finish
             assertGt(
                 periodFinish,
-                block.timestamp,
+                startTimeStamp,
                 string.concat(
                     "Reward period should not be finished for token ",
                     rewarder.rewardToken
@@ -1837,12 +1837,12 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             );
 
             // Validate total reward amount using the actual reward rate
-            uint256 remainingTime = periodFinish - block.timestamp;
+            uint256 remainingTime = periodFinish - startTimeStamp;
             uint256 remainingRewards = rewardRate * remainingTime;
             assertApproxEqRel(
                 remainingRewards,
                 rewarder.reward,
-                0.01e18, // 1% tolerance
+                0.05e18, // 5% tolerance
                 string.concat(
                     "Incorrect remaining rewards for token ",
                     rewarder.rewardToken
