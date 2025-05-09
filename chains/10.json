@@ -628,5 +628,20 @@
         "addr": "0x50d3E1BD46235ce1cCf133a74e10cfdc58d49E90",
         "isContract": true,
         "name": "USDC_METAMORPHO_FEE_SPLITTER"
+    },
+    {
+        "addr": "0x01bff41798a0bcf287b996046ca68b395dbc1071",
+        "isContract": true,
+        "name": "USDT0"
+    },
+    {
+        "addr": "0xeB7605508225517fE289c46406999F31b96c3B4A",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_USDT0"
+    },
+    {
+        "addr": "0xed37cD7872c6fe4020982d35104bE7919b8f8b33",
+        "isContract": true,
+        "name": "MOONWELL_USDT0"
     }
 ]
