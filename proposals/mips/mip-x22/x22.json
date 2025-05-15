@@ -130,7 +130,7 @@
             {
                 "collateralFactor": 0.06e18,
                 "irm": "",
-                "market": "mWBTCwh",
+                "market": "MOONWELL_mWBTC",
                 "reserveFactor": -1
             },
             {
