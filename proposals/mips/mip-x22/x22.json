@@ -148,7 +148,7 @@
             {
                 "collateralFactor": 0.31e18,
                 "irm": "",
-                "market": "mFRAX",
+                "market": "moonwell_mFRAX",
                 "reserveFactor": -1
             }
         ],
