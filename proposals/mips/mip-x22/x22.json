@@ -144,6 +144,12 @@
                 "irm": "",
                 "market": "mxcUSDT",
                 "reserveFactor": -1
+            },
+            {
+                "collateralFactor": 0.31e18,
+                "irm": "",
+                "market": "mFRAX",
+                "reserveFactor": -1
             }
         ],
         "irModels": []
