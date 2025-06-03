@@ -8,9 +8,9 @@ import {MultiRewardsDeploy} from "src/rewards/MultiRewardsDeploy.sol";
 
 /// test commands:
 ///
-///      forge script DeployMultiRewards -vvv --fork-url base
+///      forge script script/DeployMultiRewards.s.sol -vvv --fork-url base
 ///
-///      forge script DeployMultiRewards -vvv --fork-url optimism
+///      forge script script/DeployMultiRewards.s.sol -vvv --fork-url optimism
 ///
 contract DeployMultiRewards is Script, MultiRewardsDeploy {
     function run() public {
@@ -26,7 +26,7 @@ contract DeployMultiRewards is Script, MultiRewardsDeploy {
 
         vm.stopBroadcast();
 
-        addresses.addAddress("MULTI_REWARDS", multiRewards);
+        addresses.addAddress("USDC_MULTI_REWARDER", multiRewards);
         addresses.printAddresses();
     }
 }

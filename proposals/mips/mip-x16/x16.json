@@ -208,7 +208,8 @@
                 "to": "RESERVE_AUTOMATION_cbETH"
             }
         ],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "1284": {
         "bridgeToRecipient": [
@@ -667,7 +668,8 @@
                 "amount": 1.7444674492313098e24,
                 "to": "ECOSYSTEM_RESERVE_PROXY"
             }
-        ]
+        ],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1744947000,
     "startTimeStamp": 1742527800

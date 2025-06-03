@@ -200,7 +200,8 @@
             }
         ],
         "transferReserves": [],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "1284": {
         "bridgeToRecipient": [
@@ -563,7 +564,8 @@
             }
         ],
         "transferReserves": [],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1737689400,
     "startTimeStamp": 1735270200

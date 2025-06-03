@@ -648,5 +648,10 @@
         "addr": "0xed37cD7872c6fe4020982d35104bE7919b8f8b33",
         "isContract": true,
         "name": "MOONWELL_USDT0"
+    },
+    {
+        "addr": "0x2EED2b7d44E2cF64a41B6b3f78bE2Fdc56223d2B",
+        "isContract": true,
+        "name": "USDC_MULTI_REWARDER"
     }
 ]

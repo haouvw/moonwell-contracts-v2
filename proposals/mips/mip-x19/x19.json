@@ -237,7 +237,8 @@
                 "amount": 333999000000000000000,
                 "to": "ECOSYSTEM_RESERVE_PROXY"
             }
-        ]
+        ],
+        "multiRewarder": []
     },
     "1284": {
         "bridgeToRecipient": [
@@ -704,7 +705,8 @@
                 "amount": 9.405303252982026e24,
                 "to": "ECOSYSTEM_RESERVE_PROXY"
             }
-        ]
+        ],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1747366200,
     "startTimeStamp": 1744947000
