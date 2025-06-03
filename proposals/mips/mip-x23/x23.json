@@ -272,28 +272,17 @@
         ],
         "multiRewarder": [
             {
-                "addRewards": [
-                    {
-                        "distributor": "USDC_MULTI_REWARDER",
-                        "duration": 2419200,
-                        "rewardToken": "WELL"
-                    },
-                    {
-                        "distributor": "USDC_MULTI_REWARDER",
-                        "duration": 2419200,
-                        "rewardToken": "OP"
-                    }
-                ],
-                "notifyRewardAmount": [
-                    {
-                        "reward": 1.1105519112725594e23,
-                        "rewardToken": "WELL"
-                    },
-                    {
-                        "reward": 1e22,
-                        "rewardToken": "OP"
-                    }
-                ],
+                "distributor": "USDC_MULTI_REWARDER",
+                "duration": 2419200,
+                "reward": 1.1105519112725594e23,
+                "rewardToken": "WELL",
+                "vault": "USDC_METAMORPHO_VAULT"
+            },
+            {
+                "distributor": "USDC_MULTI_REWARDER",
+                "duration": 2419200,
+                "reward": 1e22,
+                "rewardToken": "OP",
                 "vault": "USDC_METAMORPHO_VAULT"
             }
         ]
@@ -805,7 +794,8 @@
                 "amount": 2.693054765210534e24,
                 "to": "ECOSYSTEM_RESERVE_PROXY"
             }
-        ]
+        ],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1752204600,
     "startTimeStamp": 1749785400
