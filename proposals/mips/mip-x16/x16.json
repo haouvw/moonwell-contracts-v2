@@ -208,7 +208,8 @@
                 "to": "RESERVE_AUTOMATION_cbETH"
             }
         ],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "1284": {
         "bridgeToRecipient": [
