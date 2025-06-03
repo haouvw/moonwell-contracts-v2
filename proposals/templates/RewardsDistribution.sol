@@ -324,6 +324,8 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             bytes32(uint256(153)),
             encodedData
         );
+
+        // TODO remove this after approval is given
     }
 
     function afterSimulationHook(Addresses addresses) public override {
@@ -1266,9 +1268,23 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256,
                 uint256
             ) {
-                // rewardData exists
+                _pushAction(
+                    distributor,
+                    abi.encodeWithSignature(
+                        "setRewardsDuration(address,uint256)",
+                        rewardToken,
+                        multiRewarder.duration
+                    ),
+                    string.concat(
+                        "Set reward duration for ",
+                        vm.getLabel(rewardToken),
+                        " on ",
+                        multiRewarder.vault,
+                        " with duration ",
+                        vm.toString(multiRewarder.duration)
+                    )
+                );
             } catch {
-                // rewardData does not exist, call addReward
                 _pushAction(
                     addresses.getAddress(multiRewarder.vault),
                     abi.encodeWithSignature(
@@ -1289,7 +1305,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     )
                 );
             }
-
             // approve the vault to spend the reward token
             _pushAction(
                 rewardToken,
@@ -1305,6 +1320,8 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     vm.getLabel(addresses.getAddress(multiRewarder.vault))
                 )
             );
+
+            console.log("notifyRewardAmount");
 
             // Notify reward amount
             _pushAction(
@@ -1780,10 +1797,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
