@@ -718,13 +718,6 @@
                 "newBorrowSpeed": 39417469221032190,
                 "newEndTime": 1752204600,
                 "newSupplySpeed": 32250656635389970
-            },
-            {
-                "emissionToken": "USDC",
-                "market": "MOONWELL_MORPHO",
-                "newBorrowSpeed": -1,
-                "newEndTime": -1,
-                "newSupplySpeed": -1
             }
         ],
         "stkWellEmissionsPerSecond": 2442882711610627600,
