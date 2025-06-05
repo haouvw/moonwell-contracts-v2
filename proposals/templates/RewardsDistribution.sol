@@ -813,6 +813,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
             externalChainActions[_chainId].multiRewarder.push(multiRewarder);
         }
+
+        if (multiRewarders.length == 0) {
+            console.log("no multiRewarder");
+        }
     }
 
     function _buildMoonbeamActions(Addresses addresses) private {
@@ -1745,6 +1749,8 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                             setRewardSpeed.market
                         );
 
+                        console.log("market");
+
                         if (setRewardSpeed.newSupplySpeed != -1) {
                             assertEq(
                                 int256(_config.supplyEmissionsPerSec),
@@ -1757,6 +1763,8 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                             );
                         }
 
+                        console.log("newSupplySpeed");
+
                         if (setRewardSpeed.newBorrowSpeed != -1) {
                             assertEq(
                                 int256(_config.borrowEmissionsPerSec),
@@ -1768,6 +1776,8 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                                 )
                             );
                         }
+
+                        console.log("newBorrowSpeed");
 
                         if (setRewardSpeed.newEndTime != -1) {
                             assertEq(
@@ -1785,6 +1795,9 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
         }
 
+        console.log("multiRewarder");
+        console.log(spec.multiRewarder.length);
+
         // Validate MultiRewarder configurations
         for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
             MultiRewarder memory rewarder = spec.multiRewarder[i];
@@ -1797,10 +1810,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
-                // lastUpdateTime
                 ,
 
-            ) = multiRewards.rewardData(
+            ) = // lastUpdateTime
+                multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
