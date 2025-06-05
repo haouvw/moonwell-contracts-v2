@@ -370,8 +370,7 @@
             }
         ],
         "stkWellEmissionsPerSecond": 76225803858344030,
-        "withdrawWell": [],
-        "multiRewarder": []
+        "withdrawWell": []
     },
     "8453": {
         "initSale": {
