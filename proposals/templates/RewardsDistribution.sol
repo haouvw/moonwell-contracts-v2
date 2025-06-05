@@ -1796,7 +1796,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         }
 
         console.log("multiRewarder");
-        console.log(spec.multiRewarder.length);
 
         // Validate MultiRewarder configurations
         for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
