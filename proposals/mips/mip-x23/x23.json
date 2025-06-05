@@ -215,6 +215,12 @@
                 "from": "TEMPORAL_GOVERNOR",
                 "to": "MRD_PROXY",
                 "token": "xWELL_PROXY"
+            },
+            {
+                "amount": 1e22,
+                "from": "FOUNDATION_OP_MULTISIG",
+                "to": "TEMPORAL_GOVERNOR",
+                "token": "OP"
             }
         ],
         "transferReserves": [
