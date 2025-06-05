@@ -272,18 +272,18 @@
         ],
         "multiRewarder": [
             {
-                "distributor": "USDC_MULTI_REWARDER",
+                "distributor": "TEMPORAL_GOVERNOR",
                 "duration": 2419200,
                 "reward": 1.1105519112725594e23,
                 "rewardToken": "xWELL_PROXY",
-                "vault": "USDC_METAMORPHO_VAULT"
+                "vault": "USDC_MULTI_REWARDER"
             },
             {
-                "distributor": "USDC_MULTI_REWARDER",
+                "distributor": "TEMPORAL_GOVERNOR",
                 "duration": 2419200,
                 "reward": 1e22,
                 "rewardToken": "OP",
-                "vault": "USDC_METAMORPHO_VAULT"
+                "vault": "USDC_MULTI_REWARDER"
             }
         ]
     },

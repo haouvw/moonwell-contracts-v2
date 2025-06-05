@@ -324,8 +324,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             bytes32(uint256(153)),
             encodedData
         );
-
-        // TODO remove this after approval is given
     }
 
     function afterSimulationHook(Addresses addresses) public override {
@@ -1260,7 +1258,11 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 multiRewarder.rewardToken
             );
 
-            try IMultiRewards(distributor).rewardData(rewardToken) returns (
+            address vault = addresses.getAddress(multiRewarder.vault);
+
+            uint256 duration = multiRewarder.duration;
+
+            try IMultiRewards(vault).rewardData(rewardToken) returns (
                 address,
                 uint256,
                 uint256,
@@ -1269,11 +1271,11 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256
             ) {
                 _pushAction(
-                    distributor,
+                    vault,
                     abi.encodeWithSignature(
                         "setRewardsDuration(address,uint256)",
                         rewardToken,
-                        multiRewarder.duration
+                        duration
                     ),
                     string.concat(
                         "Set reward duration for ",
@@ -1281,17 +1283,17 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         " on ",
                         multiRewarder.vault,
                         " with duration ",
-                        vm.toString(multiRewarder.duration)
+                        vm.toString(duration)
                     )
                 );
             } catch {
                 _pushAction(
-                    addresses.getAddress(multiRewarder.vault),
+                    vault,
                     abi.encodeWithSignature(
                         "addReward(address,address,uint256)",
                         rewardToken,
                         distributor,
-                        multiRewarder.duration
+                        duration
                     ),
                     string.concat(
                         "Add reward for ",
@@ -1299,7 +1301,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         " on ",
                         multiRewarder.vault,
                         " with duration ",
-                        vm.toString(multiRewarder.duration),
+                        vm.toString(duration),
                         " with distributor ",
                         multiRewarder.distributor
                     )
@@ -1310,22 +1312,20 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 rewardToken,
                 abi.encodeWithSignature(
                     "approve(address,uint256)",
-                    addresses.getAddress(multiRewarder.vault),
-                    multiRewarder.reward
+                    vault,
+                    duration
                 ),
                 string.concat(
                     "Approve ",
                     vm.getLabel(rewardToken),
                     " to ",
-                    vm.getLabel(addresses.getAddress(multiRewarder.vault))
+                    vm.getLabel(vault)
                 )
             );
 
-            console.log("notifyRewardAmount");
-
             // Notify reward amount
             _pushAction(
-                addresses.getAddress(multiRewarder.vault),
+                vault,
                 abi.encodeWithSignature(
                     "notifyRewardAmount(address,uint256)",
                     rewardToken,
@@ -1797,10 +1797,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
-                // lastUpdateTime
                 ,
 
-            ) = multiRewards.rewardData(
+            ) = // lastUpdateTime
+                multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
