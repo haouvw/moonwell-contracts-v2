@@ -1313,7 +1313,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 abi.encodeWithSignature(
                     "approve(address,uint256)",
                     vault,
-                    duration
+                    multiRewarder.reward
                 ),
                 string.concat(
                     "Approve ",
@@ -1797,10 +1797,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
