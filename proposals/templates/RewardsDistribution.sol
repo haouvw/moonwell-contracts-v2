@@ -814,9 +814,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             externalChainActions[_chainId].multiRewarder.push(multiRewarder);
         }
 
-        if (multiRewarders.length == 0) {
-            console.log("no multiRewarder");
-        }
+
     }
 
     function _buildMoonbeamActions(Addresses addresses) private {
@@ -1749,7 +1747,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                             setRewardSpeed.market
                         );
 
-                        console.log("market");
 
                         if (setRewardSpeed.newSupplySpeed != -1) {
                             assertEq(
@@ -1763,7 +1760,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                             );
                         }
 
-                        console.log("newSupplySpeed");
 
                         if (setRewardSpeed.newBorrowSpeed != -1) {
                             assertEq(
@@ -1777,7 +1773,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                             );
                         }
 
-                        console.log("newBorrowSpeed");
 
                         if (setRewardSpeed.newEndTime != -1) {
                             assertEq(
@@ -1795,7 +1790,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             }
         }
 
-        console.log("multiRewarder");
 
 //        // Validate MultiRewarder configurations
 //        for (uint256 i = 0; i < spec.multiRewarder.length; i++) {
