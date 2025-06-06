@@ -586,14 +586,14 @@ abstract contract HybridProposal is
 
         // Roll to allow proposal state transitions
         vm.roll(block.number + governor.votingPeriod() + 1);
-        vm.warp(1749160200 + 1 + governor.votingPeriod() + 1);
+        vm.warp(block.timestamp + 1 + governor.votingPeriod() + 1);
 
-        //                require(
-        //                    governor.state(proposalId) ==
-        //                        IMultichainGovernor.ProposalState.CrossChainVoteCollection,
-        //                    "incorrect state, not succeeded"
-        //                );
-        //
+        require(
+            governor.state(proposalId) ==
+                IMultichainGovernor.ProposalState.CrossChainVoteCollection,
+            "incorrect state, not succeeded"
+        );
+
         vm.warp(
             block.timestamp + governor.crossChainVoteCollectionPeriod() + 1
         );
