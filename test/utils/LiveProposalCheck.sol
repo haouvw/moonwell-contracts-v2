@@ -460,6 +460,7 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
 
             proposalMap.setEnv(envPath);
             Proposal proposal = Proposal(deployCode(proposalPath));
+            vm.makePersistent(address(proposal));
             vm.selectFork(proposal.primaryForkId());
 
             proposal.initProposal(addresses);
