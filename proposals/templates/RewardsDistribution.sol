@@ -330,6 +330,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         WormholeBridgeAdapter wormholeBridgeAdapter = WormholeBridgeAdapter(
             addresses.getAddress("WORMHOLE_BRIDGE_ADAPTER_PROXY")
         );
+        vm.makePersistent(address(wormholeBridgeAdapter));
 
         uint256 gasLimit = wormholeBridgeAdapter.gasLimit();
 
@@ -1797,10 +1798,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
-                // lastUpdateTime
                 ,
 
-            ) = multiRewards.rewardData(
+            ) = // lastUpdateTime
+                multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
