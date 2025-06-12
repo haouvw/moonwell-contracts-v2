@@ -1,4 +1,4 @@
-# cbXRP Asset Listing Proposal
+# MIP-B43 cbXRP Asset Listing Proposal
 
 ## cbXRP: Short Summary
 
