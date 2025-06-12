@@ -46,7 +46,7 @@ market.
 
 ### **Current Vault TVL**
 
-- As of JUne 2025, the vaults maintain a significant amount of Morpho TVL:
+- As of June 2025, the vaults maintain a significant amount of Morpho TVL:
   - Moonwell Flagship ETH Vault (Base): \$27.3M
   - Moonwell Flagship EURC Vault (Base): \$8.388M
   - Moonwell Flagship USDC Vault (Base): \$22.7M
