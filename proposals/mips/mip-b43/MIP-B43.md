@@ -1,4 +1,4 @@
-# MIP-B43 cbXRP Asset Listing Proposal
+# **MIP-B43: Add cbXRP to Base Core Markets**
 
 ## cbXRP: Short Summary
 
@@ -142,7 +142,49 @@ roughly \$90000 annual interest. After Moonwell’s 10-15% reserve cut, protocol
 revenue would be just over \$1100 per month—above the MALF threshold, with
 headroom for growth.
 
----
+## Gauntlet's Risk Analysis and Recommendations
+
+### Initial Risk Parameters
+
+| **Parameter**          | **Value**       |
+| ---------------------- | --------------- |
+| Collateral Factor (CF) | 70%             |
+| Supply Cap             | 1,000,000 cbXRP |
+| Borrow Cap             | 500,000 cbXRP   |
+| Protocol Seize Share   | 30%             |
+
+### Interest Rate Model
+
+| **Parameter**   | **Value** |
+| --------------- | --------- |
+| Base Rate       | 0%        |
+| Multiplier      | 23%       |
+| Jump Multiplier | 5×        |
+| Kink            | 45%       |
+| Reserve Factor  | 30%       |
+
+### Supporting Data
+
+- **Liquidity:** Total DEX TVL for cbXRP pairs on Aerodrome (cbXRP/WETH and
+  cbXRP/cbBTC) is roughly **$900 k**, and liquidity doubled within 12 hours on
+  **June&nbsp;5, 2025**.
+- **Circulating Supply:** About **2.3 M cbXRP** are in circulation on Base, with
+  Coinbase custody wallets holding ~91 %.
+- **Slippage:** A simulated sale of **500 k cbXRP** would incur **40 – 50 %**
+  price slippage under current conditions; setting conservative supply/borrow
+  caps mitigates this risk while liquidity deepens.
+- **Price Volatility:** Over the last 180 days, XRP’s annualized daily log
+  returns have spanned from a high of +25% to a low of -13%, underscoring the
+  asset’s sensitivity to both upward trends and downward corrections. The
+  current 30-day annualized log volatility is 60%, which is generally closer to
+  other volatile blue chip assets. XRP’s price is primarily influenced by
+  regulatory developments, most notably the SEC lawsuit, which shape investor
+  confidence and institutional adoption. Broader market sentiment, macroeconomic
+  conditions, and Ripple’s partnerships with financial institutions also play
+  key roles in driving demand. Liquidity, exchange listings, and on-chain
+  activity (like escrow releases) affect short-term volatility. Overall, XRP
+  tends to be less volatile than many other crypto assets due to its established
+  utility and relatively deep liquidity.
 
 ## Proposal Author Information
 
@@ -163,18 +205,3 @@ accessible DeFi. We invite the community to engage in discussion and help shape
 this proposal to best serve Moonwell’s long‑term vision.
 
 ---
-
-## Table of Contents
-
-1. [cbXRP: Short Summary](#cbxrp-short-summary)
-2. [Benefits to the Moonwell Community](#benefits-to-the-moonwell-community)
-3. [Resources and Socials](#resources-and-socials)
-4. [Market Risk Assessment](#market-risk-assessment)
-5. [Decentralization](#decentralization)
-6. [Smart Contract Risks](#smart-contract-risks)
-7. [Oracle Assessment](#oracle-assessment)
-8. [Swap Size Requirement](#swap-size-requirement)
-9. [Liquidity Threshold](#liquidity-threshold)
-10. [Commercial Viability](#commercial-viability)
-11. [Proposal Author Information](#proposal-author-information)
-12. [Conclusion](#conclusion)
