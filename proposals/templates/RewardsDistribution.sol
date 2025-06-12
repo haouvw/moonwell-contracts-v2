@@ -251,7 +251,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 stellaSwapRewarder
             );
         }
-
         _saveMoonbeamActions(addresses, encodedJson);
     }
 
@@ -1798,10 +1797,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
