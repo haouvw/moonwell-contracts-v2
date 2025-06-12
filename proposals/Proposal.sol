@@ -62,7 +62,6 @@ abstract contract Proposal is Script, Test {
             validate(addresses, deployerAddress);
         }
         if (DO_PRINT) {
-            console.log("calling printProposalActionSteps");
             printProposalActionSteps();
 
             addresses.removeAllRestrictions();
