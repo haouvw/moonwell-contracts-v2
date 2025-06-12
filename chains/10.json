@@ -1,28 +1,18 @@
 [
     {
-        "addr": "0x86CBee66b3FF313Af153e697f4DC02d423ACD5CE",
-        "isContract": true,
-        "name": "JUMP_RATE_IRM_MOONWELL_WETH_MIP_X25"
+        "addr": "0x0FC39BF0dEA1ce1bEE4Be77680f4F55f4ef3f8eF",
+        "name": "JUMP_RATE_IRM_MOONWELL_USDC_MIP_X25",
+        "isContract": true
     },
     {
-        "addr": "0xc27e9327a81bfAF33e5b0CC3Edc7112cC259b96b",
-        "isContract": true,
-        "name": "JUMP_RATE_IRM_MOONWELL_cbBTC_MIP_X25"
+        "addr": "0x22aD8a160e4785223cD03A86d02c3ccc2838E9FF",
+        "name": "JUMP_RATE_IRM_MOONWELL_USDT0_MIP_X25",
+        "isContract": true
     },
     {
-        "addr": "0xbcC4D66cFFbF3A5D75669984700FbC1FeaBE8487",
-        "isContract": true,
-        "name": "JUMP_RATE_IRM_MOONWELL_LBTC_MIP_X25"
-    },
-    {
-        "addr": "0x670136DBdb194b051fc9A5e973ccfB825E7f45F6",
-        "isContract": true,
-        "name": "JUMP_RATE_IRM_MOONWELL_TBTC_MIP_X25"
-    },
-    {
-        "addr": "0xe8A41eC7fE1C991E7cfBa7f5AA1b5895EAc8307D",
-        "isContract": true,
-        "name": "JUMP_RATE_IRM_MOONWELL_AERO_MIP_X25"
+        "addr": "0x01635c141C070944EAE7919443ff61dB2a6a4597",
+        "name": "JUMP_RATE_IRM_MOONWELL_WETH_MIP_X25",
+        "isContract": true
     },
     {
         "addr": "0x4200000000000000000000000000000000000006",
