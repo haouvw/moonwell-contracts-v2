@@ -291,15 +291,6 @@ abstract contract HybridProposal is
 
         uint256 currIndex = 0;
         for (uint256 i = 0; i < actions.length; i++) {
-            console.log("actions[i].target");
-            console.log(actions[i].target);
-            console.log("actions[i].data");
-            console.logBytes(actions[i].data);
-            console.log("actions[i].value");
-            console.log(actions[i].value);
-            console.log("actions[i].actionType");
-            console.log(uint256(actions[i].actionType));
-
             /// target cannot be address 0 as that call will fail
             require(
                 actions[i].target != address(0),
@@ -533,7 +524,6 @@ abstract contract HybridProposal is
             checkBaseOptimismActions(actions.filter(ActionType.Base));
 
             vm.selectFork(OPTIMISM_FORK_ID);
-            console.log("actions");
             checkBaseOptimismActions(actions.filter(ActionType.Optimism));
 
             vm.selectFork(MOONBEAM_FORK_ID);

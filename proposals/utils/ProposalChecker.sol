@@ -73,13 +73,11 @@ abstract contract ProposalChecker {
 
         for (uint256 i = 0; i < targets.length; i++) {
             address target = targets[i];
-            console.log("target");
-            console.log(target);
             /// there's 0 reason for any proposal actions to call addresses with 0 bytecode
-            //   require(
-            //       target.code.length > 0,
-            //       "target for base/optimism action not a contract"
-            //   );
+            require(
+                target.code.length > 0,
+                "target for base/optimism action not a contract"
+            );
         }
     }
 
