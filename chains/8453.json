@@ -1045,11 +1045,6 @@
         "name": "CHAINLINK_cbXRP_USD"
     },
     {
-        "addr": "0x9f0C1dD78C4CBdF5b9cf923a549A201EdC676D34",
-        "isContract": true,
-        "name": "CHAINLINK_cbXRP_USD"
-    },
-    {
         "addr": "0xcB95579c706144f3150f7C3b1BD3F24A48d3463e",
         "isContract": true,
         "name": "JUMP_RATE_IRM_MOONWELL_cbXRP"
