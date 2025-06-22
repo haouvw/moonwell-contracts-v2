@@ -333,5 +333,30 @@
         "addr": "0x80308dCE5bd550209FDb22871ce411869014EE8E",
         "name": "API3_GLMR_USD_FEED",
         "isContract": true
+    },
+    {
+        "addr": "0xccDf06F6c0F53b0e753E816E226bfD349e397736",
+        "name": "API3_DOT_USD_FEED",
+        "isContract": true
+    },
+    {
+        "addr": "0x5C4916479fAAE9E248CCf8D981Ec18D6eF709057",
+        "name": "API3_USDT_USD_FEED",
+        "isContract": true
+    },
+    {
+        "addr": "0x4Fa8b7153D770e2Ead9BF293244aAa9064032a94",
+        "name": "API3_USDC_USD_FEED",
+        "isContract": true
+    },
+    {
+        "addr": "0x1Ae6fCC292417245F2DB747317FBaA1E3914Fa0d",
+        "name": "API3_ETH_USD_FEED",
+        "isContract": true
+    },
+    {
+        "addr": "0x9f61b8e136F3cbe9A678BbAE652819c13531Fd29",
+        "name": "API3_BTC_USD_FEED",
+        "isContract": true
     }
 ]
