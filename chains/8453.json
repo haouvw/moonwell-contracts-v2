@@ -1043,5 +1043,10 @@
         "addr": "0x9f0C1dD78C4CBdF5b9cf923a549A201EdC676D34",
         "isContract": true,
         "name": "CHAINLINK_cbXRP_USD"
+    },
+    {
+        "addr": "0x9f0C1dD78C4CBdF5b9cf923a549A201EdC676D34",
+        "isContract": true,
+        "name": "ANTHIAS_MULTISIG"
     }
 ]
