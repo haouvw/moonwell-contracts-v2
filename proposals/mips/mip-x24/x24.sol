@@ -33,14 +33,21 @@ contract x24 is HybridProposal, Configs, Networks {
                 ),
                 string.concat("Set borrow cap guardian on ", networks[i].name)
             );
-            _pushAction(
-                addresses.getAddress("UNITROLLER"),
-                abi.encodeWithSignature(
-                    "_setSupplyCapGuardian(address)",
-                    addresses.getAddress("ANTHIAS_MULTISIG")
-                ),
-                string.concat("Set supply cap guardian on ", networks[i].name)
-            );
+
+            // No supply cap guardian on Moonbeam
+            if (networks[i].chainId != MOONBEAM_FORK_ID) {
+                _pushAction(
+                    addresses.getAddress("UNITROLLER"),
+                    abi.encodeWithSignature(
+                        "_setSupplyCapGuardian(address)",
+                        addresses.getAddress("ANTHIAS_MULTISIG")
+                    ),
+                    string.concat(
+                        "Set supply cap guardian on ",
+                        networks[i].name
+                    )
+                );
+            }
         }
     }
 
@@ -63,15 +70,19 @@ contract x24 is HybridProposal, Configs, Networks {
                     " is not set"
                 )
             );
-            assertEq(
-                unitroller.supplyCapGuardian(),
-                guardian,
-                string.concat(
-                    "Supply cap guardian on ",
-                    networks[i].name,
-                    " is not set"
-                )
-            );
+
+            // No supply cap guardian on Moonbeam
+            if (networks[i].chainId != MOONBEAM_FORK_ID) {
+                assertEq(
+                    unitroller.supplyCapGuardian(),
+                    guardian,
+                    string.concat(
+                        "Supply cap guardian on ",
+                        networks[i].name,
+                        " is not set"
+                    )
+                );
+            }
         }
     }
 }
