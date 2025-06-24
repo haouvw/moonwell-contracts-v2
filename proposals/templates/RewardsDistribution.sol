@@ -1269,7 +1269,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256,
                 uint256,
                 uint256
-            ) {
+            ) && vm.envBool("FORCE_ADD_REWARD") == false) {
                 _pushAction(
                     vault,
                     abi.encodeWithSignature(
