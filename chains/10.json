@@ -655,7 +655,7 @@
         "name": "USDC_MULTI_REWARDER"
     },
     {
-        "addr": "0x2EED2b7d44E2cF64a41B6b3f78bE2Fdc56223d2B",
+        "addr": "0x39Bd42ce85CcC2f8792f13B2726369cD3F946D7c",
         "isContract": true,
         "name": "ANTHIAS_MULTISIG"
     }
