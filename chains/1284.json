@@ -340,6 +340,11 @@
         "isContract": true
     },
     {
+        "addr": "0xEDF5858B2eB814f1748272dbe2B13b8ca161Dde6",
+        "name": "API3_FRAX_USD_FEED",
+        "isContract": true
+    },
+    {
         "addr": "0x5C4916479fAAE9E248CCf8D981Ec18D6eF709057",
         "name": "API3_USDT_USD_FEED",
         "isContract": true
