@@ -129,6 +129,7 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
                     HybridProposal proposal = HybridProposal(
                         deployCode(proposalPath)
                     );
+                    vm.label(address(proposal), proposalPath);
                     vm.makePersistent(address(proposal));
 
                     vm.selectFork(proposal.primaryForkId());
@@ -162,7 +163,26 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
                         (uint32, bytes, uint8)
                     );
 
-                    _execExtChain(addresses, governor, payload, proposalStart);
+                    // Get crossChainVoteCollectionEndTimestamp for the proposal
+                    (
+                        ,
+                        ,
+                        ,
+                        ,
+                        uint256 crossChainVoteCollectionEndTimestamp,
+                        ,
+                        ,
+                        ,
+
+                    ) = governor.proposalInformation(proposalStart);
+
+                    _execExtChain(
+                        addresses,
+                        governor,
+                        payload,
+                        proposalStart,
+                        crossChainVoteCollectionEndTimestamp
+                    );
                 }
                 proposalStart--;
                 count++;
@@ -206,36 +226,44 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
         ) = governor.getProposalData(proposalId);
 
         checkMoonbeamActions(targets);
+
+        uint256 crossChainVoteCollectionEndTimestamp;
         {
             // Simulate proposals execution
-            (
-                ,
-                ,
-                uint256 votingStartTime,
-                ,
-                uint256 crossChainVoteCollectionEndTimestamp,
-                ,
-                ,
-                ,
-
-            ) = governor.proposalInformation(proposalId);
-
-            vm.warp(votingStartTime);
+            (, , , , crossChainVoteCollectionEndTimestamp, , , , ) = governor
+                .proposalInformation(proposalId);
 
             governor.castVote(proposalId, 0);
+            console.log("casting vote on block.timestamp: ", block.timestamp);
 
             vm.warp(crossChainVoteCollectionEndTimestamp + 1);
         }
 
-        uint256 totalValue = 0;
+        _executeProposalActions(
+            addresses,
+            governor,
+            proposalId,
+            targets,
+            values,
+            calldatas,
+            crossChainVoteCollectionEndTimestamp
+        );
+    }
 
+    function _executeProposalActions(
+        Addresses addresses,
+        MultichainGovernor governor,
+        uint256 proposalId,
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        uint256 crossChainVoteCollectionEndTimestamp
+    ) private {
+        uint256 totalValue = 0;
         for (uint256 j = 0; j < values.length; j++) {
             totalValue += values[j];
         }
-
         vm.deal(address(this), totalValue);
-
-        bytes memory payload;
 
         address wormholeCore = addresses.getAddress("WORMHOLE_CORE");
 
@@ -255,12 +283,16 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
         proposalMap.setEnv(envPath);
 
         Proposal proposal = Proposal(deployCode(proposalPath));
+        vm.label(address(proposal), proposalPath);
+        vm.makePersistent(address(proposal));
+
         proposal.beforeSimulationHook(addresses);
 
         uint64 nextSequence = IWormhole(wormholeCore).nextSequence(
             address(governor)
         );
 
+        bytes memory payload;
         for (uint256 i = 0; i < targets.length; i++) {
             if (targets[i] == wormholeCore) {
                 // decode temporal governor calldata
@@ -286,33 +318,15 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
 
         governor.execute{value: totalValue}(proposalId);
 
-        {
-            /// supports as many destination networks as needed
-            uint256 j = targets.length;
-
-            /// iterate over all targets to check if any of them is the wormhole core
-            /// if the target is WormholeCore, run the Temporal Governor logic on the corresponding chain
-            while (j != 0) {
-                if (targets[j - 1] == wormholeCore) {
-                    console.log(
-                        "Executing Temporal Governor for proposal %i: ",
-                        proposalId
-                    );
-
-                    // decode temporal governor calldata
-                    (, payload, ) = abi.decode(
-                        /// 1. strip off function selector
-                        /// 2. decode the call to publishMessage payload
-                        calldatas[j - 1].slice(4, calldatas[j - 1].length - 4),
-                        (uint32, bytes, uint8)
-                    );
-
-                    _execExtChain(addresses, governor, payload, proposalId);
-                }
-
-                j--;
-            }
-        }
+        _processExternalChains(
+            addresses,
+            governor,
+            proposalId,
+            targets,
+            calldatas,
+            wormholeCore,
+            crossChainVoteCollectionEndTimestamp
+        );
 
         if (vm.activeFork() != MOONBEAM_FORK_ID) {
             vm.selectFork(MOONBEAM_FORK_ID);
@@ -321,11 +335,54 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
         proposal.afterSimulationHook(addresses);
     }
 
+    function _processExternalChains(
+        Addresses addresses,
+        MultichainGovernor governor,
+        uint256 proposalId,
+        address[] memory targets,
+        bytes[] memory calldatas,
+        address wormholeCore,
+        uint256 crossChainVoteCollectionEndTimestamp
+    ) private {
+        /// supports as many destination networks as needed
+        uint256 j = targets.length;
+
+        /// iterate over all targets to check if any of them is the wormhole core
+        /// if the target is WormholeCore, run the Temporal Governor logic on the corresponding chain
+        while (j != 0) {
+            if (targets[j - 1] == wormholeCore) {
+                console.log(
+                    "Executing Temporal Governor for proposal %i: ",
+                    proposalId
+                );
+
+                // decode temporal governor calldata
+                (, bytes memory payload, ) = abi.decode(
+                    /// 1. strip off function selector
+                    /// 2. decode the call to publishMessage payload
+                    calldatas[j - 1].slice(4, calldatas[j - 1].length - 4),
+                    (uint32, bytes, uint8)
+                );
+
+                _execExtChain(
+                    addresses,
+                    governor,
+                    payload,
+                    proposalId,
+                    crossChainVoteCollectionEndTimestamp
+                );
+            }
+
+            j--;
+        }
+    }
+
     function _execExtChain(
         Addresses addresses,
         MultichainGovernor governor,
         bytes memory payload,
-        uint256 proposalId
+        uint256 proposalId,
+        uint256 crossChainVoteCollectionEndTimestamp
     ) private {
         (
             address temporalGovernorAddress,
@@ -340,6 +397,7 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
             // if not, checkout to Optimism fork id
             vm.selectFork(OPTIMISM_FORK_ID);
         }
+        vm.warp(crossChainVoteCollectionEndTimestamp);
 
         address expectedTemporalGov = addresses.getAddress("TEMPORAL_GOVERNOR");
 
@@ -377,6 +435,7 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
 
         temporalGovernor.queueProposal(vaa);
 
+        console.log("block timestamp after queueing: ", block.timestamp);
         vm.warp(block.timestamp + temporalGovernor.proposalDelay());
 
         try temporalGovernor.executeProposal(vaa) {} catch (bytes memory e) {
@@ -400,8 +459,9 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
             }
 
             proposalMap.setEnv(envPath);
-
             Proposal proposal = Proposal(deployCode(proposalPath));
+            vm.makePersistent(address(proposal));
+            vm.selectFork(proposal.primaryForkId());
 
             proposal.initProposal(addresses);
             proposal.beforeSimulationHook(addresses);
