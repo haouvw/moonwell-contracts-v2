@@ -1262,7 +1262,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
             uint256 duration = multiRewarder.duration;
 
-            if (vm.envBool("FORCE_ADD_REWARD") == true) {
+            if (vm.envOr("FORCE_ADD_REWARD", false)) {
                 _pushAction(
                     vault,
                     abi.encodeWithSignature(
@@ -1819,10 +1819,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
