@@ -26,7 +26,7 @@ contract x24 is HybridProposal, Configs {
         _pushAction(
             addresses.getAddress("UNITROLLER"),
             abi.encodeWithSignature(
-                "setBorrowCapGuardian(address)",
+                "_setBorrowCapGuardian(address)",
                 addresses.getAddress("ANTHIAS_MULTISIG")
             ),
             "Set borrow cap guardian on Base"
@@ -35,7 +35,7 @@ contract x24 is HybridProposal, Configs {
         _pushAction(
             addresses.getAddress("UNITROLLER"),
             abi.encodeWithSignature(
-                "setSupplyCapGuardian(address)",
+                "_setSupplyCapGuardian(address)",
                 addresses.getAddress("ANTHIAS_MULTISIG")
             ),
             "Set supply cap guardian on Base"
