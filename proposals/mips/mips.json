@@ -2,6 +2,13 @@
     {
         "envpath": "",
         "governor": "MultichainGovernor",
+        "id": 0,
+        "path": "x24.sol/x24.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "",
+        "governor": "MultichainGovernor",
         "id": 103,
         "path": "b44.sol/b44.json",
         "proposalType": "HybridProposal"
