@@ -3,12 +3,13 @@ pragma solidity 0.8.19;
 
 import {HybridProposal} from "@proposals/proposalTypes/HybridProposal.sol";
 import {Configs} from "@proposals/Configs.sol";
-import {BASE_FORK_ID, OPTIMISM_FORK_ID} from "@utils/ChainIds.sol";
+import {BASE_FORK_ID, OPTIMISM_FORK_ID, MOONBEAM_FORK_ID} from "@utils/ChainIds.sol";
 import {AllChainAddresses as Addresses} from "@proposals/Addresses.sol";
 import {Comptroller} from "@protocol/Comptroller.sol";
+import {Networks} from "@proposals/utils/Networks.sol";
 
-// this proposal should call Comptroller._setBorrowCapGuardian and Comptroller._setSupplyCapGuardian on both Base and Optimism
-contract x24 is HybridProposal, Configs {
+// this proposal should call Comptroller._setBorrowCapGuardian and Comptroller._setSupplyCapGuardian on both Moonbeam, Base and Optimism
+contract x24 is HybridProposal, Configs, Networks {
     string public constant override name = "MIP-X24";
 
     constructor() {
@@ -18,78 +19,59 @@ contract x24 is HybridProposal, Configs {
     }
 
     function primaryForkId() public pure override returns (uint256) {
-        return BASE_FORK_ID;
+        return MOONBEAM_FORK_ID;
     }
 
     function build(Addresses addresses) public override {
-        vm.selectFork(BASE_FORK_ID);
-        _pushAction(
-            addresses.getAddress("UNITROLLER"),
-            abi.encodeWithSignature(
-                "_setBorrowCapGuardian(address)",
-                addresses.getAddress("ANTHIAS_MULTISIG")
-            ),
-            "Set borrow cap guardian on Base"
-        );
-
-        _pushAction(
-            addresses.getAddress("UNITROLLER"),
-            abi.encodeWithSignature(
-                "_setSupplyCapGuardian(address)",
-                addresses.getAddress("ANTHIAS_MULTISIG")
-            ),
-            "Set supply cap guardian on Base"
-        );
-
-        vm.selectFork(OPTIMISM_FORK_ID);
-
-        _pushAction(
-            addresses.getAddress("UNITROLLER"),
-            abi.encodeWithSignature(
-                "setBorrowCapGuardian(address)",
-                addresses.getAddress("ANTHIAS_MULTISIG")
-            ),
-            "Set borrow cap guardian on Optimism"
-        );
-
-        _pushAction(
-            addresses.getAddress("UNITROLLER"),
-            abi.encodeWithSignature(
-                "setSupplyCapGuardian(address)",
-                addresses.getAddress("ANTHIAS_MULTISIG")
-            ),
-            "Set supply cap guardian on Optimism"
-        );
+        for (uint256 i = 0; i < networks.length; i++) {
+            vm.selectFork(networks[i].forkId);
+            _pushAction(
+                addresses.getAddress("UNITROLLER"),
+                abi.encodeWithSignature(
+                    "_setBorrowCapGuardian(address)",
+                    addresses.getAddress("ANTHIAS_MULTISIG")
+                ),
+                string.concat("Set borrow cap guardian on ", networks[i].name)
+            );
+            _pushAction(
+                addresses.getAddress("UNITROLLER"),
+                abi.encodeWithSignature(
+                    "_setSupplyCapGuardian(address)",
+                    addresses.getAddress("ANTHIAS_MULTISIG")
+                ),
+                string.concat("Set supply cap guardian on ", networks[i].name)
+            );
+        }
     }
 
     function validate(Addresses addresses, address) public override {
-        vm.selectFork(BASE_FORK_ID);
-        address guardian = addresses.getAddress("ANTHIAS_MULTISIG");
-        Comptroller unitroller = Comptroller(
-            addresses.getAddress("UNITROLLER")
-        );
+        vm.selectFork(MOONBEAM_FORK_ID);
+        for (uint256 i = 0; i < networks.length; i++) {
+            vm.selectFork(networks[i].forkId);
 
-        assertEq(
-            unitroller.borrowCapGuardian(),
-            guardian,
-            "Borrow cap guardian on Base is not set"
-        );
-        assertEq(
-            unitroller.supplyCapGuardian(),
-            guardian,
-            "Supply cap guardian on Base is not set"
-        );
+            address guardian = addresses.getAddress("ANTHIAS_MULTISIG");
+            Comptroller unitroller = Comptroller(
+                addresses.getAddress("UNITROLLER")
+            );
 
-        vm.selectFork(OPTIMISM_FORK_ID);
-        assertEq(
-            unitroller.borrowCapGuardian(),
-            guardian,
-            "Borrow cap guardian on Optimism is not set"
-        );
-        assertEq(
-            unitroller.supplyCapGuardian(),
-            guardian,
-            "Supply cap guardian on Optimism is not set"
-        );
+            assertEq(
+                unitroller.borrowCapGuardian(),
+                guardian,
+                string.concat(
+                    "Borrow cap guardian on ",
+                    networks[i].name,
+                    " is not set"
+                )
+            );
+            assertEq(
+                unitroller.supplyCapGuardian(),
+                guardian,
+                string.concat(
+                    "Supply cap guardian on ",
+                    networks[i].name,
+                    " is not set"
+                )
+            );
+        }
     }
 }
