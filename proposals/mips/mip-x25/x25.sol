@@ -9,12 +9,12 @@ import {Comptroller} from "@protocol/Comptroller.sol";
 import {Networks} from "@proposals/utils/Networks.sol";
 
 // this proposal should call Comptroller._setBorrowCapGuardian and Comptroller._setSupplyCapGuardian on both Moonbeam, Base and Optimism
-contract x24 is HybridProposal, Configs, Networks {
-    string public constant override name = "MIP-X24";
+contract x25 is HybridProposal, Configs, Networks {
+    string public constant override name = "MIP-X25";
 
     constructor() {
         _setProposalDescription(
-            bytes(vm.readFile("./proposals/mips/mip-x24/MIP-X24.md"))
+            bytes(vm.readFile("./proposals/mips/mip-x25/MIP-X25.md"))
         );
     }
 
@@ -35,7 +35,7 @@ contract x24 is HybridProposal, Configs, Networks {
             );
 
             // No supply cap guardian on Moonbeam
-            if (networks[i].chainId != MOONBEAM_FORK_ID) {
+            if (networks[i].forkId != MOONBEAM_FORK_ID) {
                 _pushAction(
                     addresses.getAddress("UNITROLLER"),
                     abi.encodeWithSignature(
@@ -52,7 +52,6 @@ contract x24 is HybridProposal, Configs, Networks {
     }
 
     function validate(Addresses addresses, address) public override {
-        vm.selectFork(MOONBEAM_FORK_ID);
         for (uint256 i = 0; i < networks.length; i++) {
             vm.selectFork(networks[i].forkId);
 
@@ -72,7 +71,7 @@ contract x24 is HybridProposal, Configs, Networks {
             );
 
             // No supply cap guardian on Moonbeam
-            if (networks[i].chainId != MOONBEAM_FORK_ID) {
+            if (networks[i].forkId != MOONBEAM_FORK_ID) {
                 assertEq(
                     unitroller.supplyCapGuardian(),
                     guardian,
