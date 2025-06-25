@@ -2,7 +2,7 @@
     {
         "envpath": "",
         "governor": "MultichainGovernor",
-        "id": 0,
+        "id": 106,
         "path": "x25.sol/x25.json",
         "proposalType": "HybridProposal"
     },
