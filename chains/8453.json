@@ -1058,5 +1058,25 @@
         "addr": "0x6308204872BdB7432dF97b04B42443c714904F3E",
         "isContract": true,
         "name": "MOONWELL_MORPHO"
+    },
+    {
+        "addr": "0xcb585250f852c6c6bf90434ab21a00f02833a4af",
+        "isContract": true,
+        "name": "cbXRP"
+    },
+    {
+        "addr": "0x9f0C1dD78C4CBdF5b9cf923a549A201EdC676D34",
+        "isContract": true,
+        "name": "CHAINLINK_cbXRP_USD"
+    },
+    {
+        "addr": "0xcB95579c706144f3150f7C3b1BD3F24A48d3463e",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_cbXRP"
+    },
+    {
+        "addr": "0xb4fb8fed5b3AaA8434f0B19b1b623d977e07e86d",
+        "isContract": true,
+        "name": "MOONWELL_cbXRP"
     }
 ]
