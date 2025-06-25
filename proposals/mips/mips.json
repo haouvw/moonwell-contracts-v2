@@ -7,6 +7,13 @@
         "proposalType": "HybridProposal"
     },
     {
+        "envpath": "",
+        "governor": "MultichainGovernor",
+        "id": 103,
+        "path": "b44.sol/b44.json",
+        "proposalType": "HybridProposal"
+    },
+    {
         "envpath": "proposals/mips/mip-b43/b43.sh",
         "governor": "MultichainGovernor",
         "id": 104,
