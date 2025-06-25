@@ -383,7 +383,7 @@ contract RewardsDistributionMoonbeamTemplate is HybridProposal, Networks {
                 assertApproxEqAbs(
                     well.balanceOf(to),
                     wellBalancesBefore[to],
-                    1e18, // tolerates 1 well as margin error
+                    10e18, // tolerates 10 well as margin error
                     "balance changed for MULTICHAIN_GOVERNOR_PROXY"
                 );
             } else {

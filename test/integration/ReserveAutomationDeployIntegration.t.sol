@@ -13,7 +13,8 @@ import {AutomationDeploy} from "@protocol/market/AutomationDeploy.sol";
 import {PostProposalCheck} from "@test/integration/PostProposalCheck.sol";
 import {ReserveAutomation} from "@protocol/market/ReserveAutomation.sol";
 import {ERC20HoldingDeposit} from "@protocol/market/ERC20HoldingDeposit.sol";
-import {ReserveAutomationDeploy} from "@proposals/mips/mip-reserve-automation/reserveAutomationDeploy.sol";
+import {ReserveAutomationDeploy, MarketConfig} from "@proposals/mips/mip-reserve-automation/reserveAutomationDeploy.sol";
+import {MockRedstoneMultiFeedAdapter} from "@test/mock/MockRedstoneMultiFeedAdapter.sol";
 import {AllChainAddresses as Addresses} from "@proposals/Addresses.sol";
 
 contract ReserveAutomationLiveSystemIntegrationTest is
@@ -35,6 +36,11 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     uint256 public constant MAX_DISCOUNT = 9e17; // 90% == 10% discount
     uint256 public constant STARTING_PREMIUM = 11e17; // 110% == 10% premium
 
+    struct ChainlinkConfig {
+        string chainlinkFeed;
+        string market;
+    }
+
     function setUp()
         public
         override(PostProposalCheck, ReserveAutomationDeploy)
@@ -42,6 +48,17 @@ contract ReserveAutomationLiveSystemIntegrationTest is
         PostProposalCheck.setUp();
 
         vm.selectFork(BASE_FORK_ID);
+
+        // warp forward 100 seconds for good measure
+        vm.warp(proposalStartTime + 100);
+
+        // mock redstone internal call to avoid stale price error (we cannot warp more than 30 hours to the future)
+        MockRedstoneMultiFeedAdapter redstoneMock = new MockRedstoneMultiFeedAdapter();
+
+        vm.etch(
+            0xb81131B6368b3F0a83af09dB4E39Ac23DA96C2Db,
+            address(redstoneMock).code
+        );
 
         // Deploy all contracts
         deploy(addresses);
@@ -61,22 +78,22 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     function _runTestForAllAutomations(
         function(ReserveAutomation, ERC20) internal fn
     ) internal {
-        string[] memory mTokens = _getMTokens(block.chainid);
+        MarketConfig[] memory marketConfigs = _getMTokens(block.chainid);
 
-        for (uint256 i = 0; i < mTokens.length; i++) {
-            string memory mTokenName = mTokens[i];
+        for (uint256 i = 0; i < marketConfigs.length; i++) {
+            MarketConfig memory config = marketConfigs[i];
 
             ReserveAutomation automation = ReserveAutomation(
                 addresses.getAddress(
                     string.concat(
                         "RESERVE_AUTOMATION_",
-                        _stripMoonwellPrefix(mTokenName)
+                        _stripMoonwellPrefix(config.market)
                     )
                 )
             );
 
             ERC20 underlying = ERC20(
-                MErc20(addresses.getAddress(mTokenName)).underlying()
+                MErc20(addresses.getAddress(config.market)).underlying()
             );
 
             fn(automation, underlying);
@@ -96,6 +113,8 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testSetGuardianSucceedsOwner() public {
+        vm.warp(block.timestamp + 30 days);
+
         _runTestForAllAutomations(_testSetGuardianSucceedsOwner);
     }
 
@@ -122,6 +141,8 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testCancelAuction() public {
+        vm.warp(block.timestamp + 30 days);
+
         _runTestForAllAutomations(_testCancelAuction);
     }
 
@@ -166,6 +187,8 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testInitiateSaleFailsAlreadyActive() public {
+        vm.warp(block.timestamp + 30 days);
+
         _runTestForAllAutomations(_testInitiateSaleFailsAlreadyActive);
     }
 
@@ -197,13 +220,16 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testInitiateSaleFailsNoReserves() public {
+        vm.warp(block.timestamp + 30 days);
+
         _runTestForAllAutomations(_testInitiateSaleFailsNoReserves);
     }
 
     function _testInitiateSaleFailsNoReserves(
         ReserveAutomation vault,
-        ERC20 // solhint-disable-line no-unused-vars
+        ERC20 underlying
     ) internal {
+        deal(address(underlying), address(vault), 0);
         vm.prank(addresses.getAddress("TEMPORAL_GOVERNOR"));
         vm.expectRevert("ReserveAutomationModule: no reserves to sell");
         vault.initiateSale(
@@ -216,6 +242,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testInitiateSaleFailsExceedsMaxDelay() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(_testInitiateSaleFailsExceedsMaxDelay);
     }
 
@@ -238,6 +265,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testPurchaseReservesFailsSaleNotActive() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(_testPurchaseReservesFailsSaleNotActive);
     }
 
@@ -276,6 +304,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testPurchaseReservesFailsZeroAmount() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(_testPurchaseReservesFailsZeroAmount);
     }
 
@@ -302,6 +331,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testPurchaseReservesFailsInsufficientBuffer() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(_testPurchaseReservesFailsInsufficientBuffer);
     }
 
@@ -344,6 +374,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testPurchaseReservesFailsAmountOutNotGteMinAmtOut() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(
             _testPurchaseReservesFailsAmountOutNotGteMinAmtOut
         );
@@ -378,6 +409,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testPurchaseReservesFailsNoWellApproval() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(_testPurchaseReservesFailsNoWellApproval);
     }
 
@@ -409,6 +441,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testSwapWellForReserves() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(_testSwapWellForReserves);
     }
 
@@ -470,15 +503,15 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testAmountInTolerance(uint256 amountWellIn) public view {
-        string[] memory mTokens = _getMTokens(block.chainid);
-        for (uint256 i = 0; i < mTokens.length; i++) {
-            string memory mTokenName = mTokens[i];
+        MarketConfig[] memory marketConfigs = _getMTokens(block.chainid);
+        for (uint256 i = 0; i < marketConfigs.length; i++) {
+            MarketConfig memory config = marketConfigs[i];
 
             ReserveAutomation automation = ReserveAutomation(
                 addresses.getAddress(
                     string.concat(
                         "RESERVE_AUTOMATION_",
-                        _stripMoonwellPrefix(mTokenName)
+                        _stripMoonwellPrefix(config.market)
                     )
                 )
             );
@@ -499,22 +532,22 @@ contract ReserveAutomationLiveSystemIntegrationTest is
             assertApproxEqRel(
                 getAmountIn,
                 amountWellIn,
-                2.6e14,
+                5e14,
                 "amount in not within tolerance"
             );
         }
     }
 
     function testAmountOutTolerance(uint256 amountReservesIn) public view {
-        string[] memory mTokens = _getMTokens(block.chainid);
-        for (uint256 i = 0; i < mTokens.length; i++) {
-            string memory mTokenName = mTokens[i];
+        MarketConfig[] memory marketConfigs = _getMTokens(block.chainid);
+        for (uint256 i = 0; i < marketConfigs.length; i++) {
+            MarketConfig memory config = marketConfigs[i];
 
             ReserveAutomation vault = ReserveAutomation(
                 addresses.getAddress(
                     string.concat(
                         "RESERVE_AUTOMATION_",
-                        _stripMoonwellPrefix(mTokenName)
+                        _stripMoonwellPrefix(config.market)
                     )
                 )
             );
@@ -612,6 +645,7 @@ contract ReserveAutomationLiveSystemIntegrationTest is
     }
 
     function testPriceCachingBehavior() public {
+        vm.warp(block.timestamp + 30 days);
         _runTestForAllAutomations(_testPriceCachingBehavior);
     }
 

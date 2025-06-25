@@ -1,6 +1,13 @@
 {
     "10": {
-        "initSales": [],
+        "initSale": {
+            "auctionPeriod": 0,
+            "delay": 0,
+            "miniAuctionPeriod": 0,
+            "periodMaxDiscount": 0,
+            "periodStartingPremium": 0,
+            "reserveAutomationContracts": []
+        },
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
@@ -179,7 +186,8 @@
             }
         ],
         "transferReserves": [],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "1284": {
         "bridgeToRecipient": [
@@ -348,7 +356,14 @@
         "stkWellEmissionsPerSecond": 199856874801030100
     },
     "8453": {
-        "initSales": [],
+        "initSale": {
+            "auctionPeriod": 0,
+            "delay": 0,
+            "miniAuctionPeriod": 0,
+            "periodMaxDiscount": 0,
+            "periodStartingPremium": 0,
+            "reserveAutomationContracts": []
+        },
         "setMRDSpeeds": [
             {
                 "emissionToken": "xWELL_PROXY",
@@ -521,7 +536,8 @@
             }
         ],
         "transferReserves": [],
-        "withdrawWell": []
+        "withdrawWell": [],
+        "multiRewarder": []
     },
     "endTimeSTamp": 1730431800,
     "startTimeStamp": 1728012600

@@ -10,7 +10,7 @@ runs:
         submodules: recursive
 
     - name: Cache Foundry toolchain
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.foundry
         key: ${{ runner.os }}-foundry-${{ hashFiles('**/foundry.toml') }}
@@ -28,6 +28,10 @@ runs:
 
     - name: Compile Proposals
       run: forge compile --contracts proposals/
+      shell: bash
+
+    - name: Compile MultiRewarder
+      run: forge compile --contracts crv-rewards/
       shell: bash
 
     - name: Compile Contracts

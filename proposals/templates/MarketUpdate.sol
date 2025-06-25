@@ -15,6 +15,7 @@ import {JumpRateModel} from "@protocol/irm/JumpRateModel.sol";
 import {HybridProposal} from "@proposals/proposalTypes/HybridProposal.sol";
 import {ParameterValidation} from "@proposals/utils/ParameterValidation.sol";
 import {AllChainAddresses as Addresses} from "@proposals/Addresses.sol";
+import {MockRedstoneMultiFeedAdapter} from "@test/mock/MockRedstoneMultiFeedAdapter.sol";
 
 contract MarketUpdateTemplate is HybridProposal, Networks, ParameterValidation {
     using SafeCast for *;
@@ -323,5 +324,22 @@ contract MarketUpdateTemplate is HybridProposal, Networks, ParameterValidation {
                 );
             }
         }
+    }
+
+    function beforeSimulationHook(Addresses addresses) public override {
+        uint256 forkBefore = vm.activeFork();
+        vm.selectFork(BASE_FORK_ID);
+
+        MockRedstoneMultiFeedAdapter redstoneMock = new MockRedstoneMultiFeedAdapter();
+
+        vm.etch(
+            0xb81131B6368b3F0a83af09dB4E39Ac23DA96C2Db,
+            address(redstoneMock).code
+        );
+
+        if (vm.activeFork() != forkBefore) {
+            vm.selectFork(forkBefore);
+        }
+        super.beforeSimulationHook(addresses);
     }
 }

@@ -10,3 +10,4 @@
 @zelt/=lib/zelt/
 @deprecated=deprecated/
 @script=script/
+@crv-rewards=crv-rewards/

@@ -6,6 +6,7 @@ import {ProposalAction} from "@proposals/proposalTypes/IProposal.sol";
 import {AddressToString} from "@protocol/xWELL/axelarInterfaces/AddressString.sol";
 import {AllChainAddresses as Addresses} from "@proposals/Addresses.sol";
 import {MOONBEAM_CHAIN_ID, MOONBASE_CHAIN_ID} from "@protocol/utils/ChainIds.sol";
+import {console} from "forge-std/console.sol";
 
 abstract contract ProposalChecker {
     using ChainIds for uint256;
@@ -72,7 +73,6 @@ abstract contract ProposalChecker {
 
         for (uint256 i = 0; i < targets.length; i++) {
             address target = targets[i];
-
             /// there's 0 reason for any proposal actions to call addresses with 0 bytecode
             require(
                 target.code.length > 0,

@@ -60,7 +60,6 @@ abstract contract Proposal is Script, Test {
         if (DO_TEARDOWN) teardown(addresses, deployerAddress);
         if (DO_VALIDATE) {
             validate(addresses, deployerAddress);
-            console.log("Validation completed for proposal ", this.name());
         }
         if (DO_PRINT) {
             printProposalActionSteps();

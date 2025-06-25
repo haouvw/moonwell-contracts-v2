@@ -1,5 +1,117 @@
 [
     {
+        "envpath": "proposals/mips/mip-x24/x24.sh",
+        "governor": "MultichainGovernor",
+        "id": 105,
+        "path": "MarketUpdate.sol/MarketUpdateTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-b43/b43.sh",
+        "governor": "MultichainGovernor",
+        "id": 104,
+        "path": "MarketAddV2.sol/MarketAddV2.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x23/x23.sh",
+        "governor": "MultichainGovernor",
+        "id": 100,
+        "path": "RewardsDistribution.sol/RewardsDistributionTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x22/x22.sh",
+        "governor": "MultichainGovernor",
+        "id": 99,
+        "path": "MarketUpdate.sol/MarketUpdateTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-o14/o14.sh",
+        "governor": "MultichainGovernor",
+        "id": 96,
+        "path": "MarketAddV2.sol/MarketAddV2.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x21/x21.sh",
+        "governor": "MultichainGovernor",
+        "id": 97,
+        "path": "RewardsDistribution.sol/RewardsDistributionTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x20/x20.sh",
+        "governor": "MultichainGovernor",
+        "id": 94,
+        "path": "MarketUpdate.sol/MarketUpdateTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "",
+        "governor": "MultichainGovernor",
+        "id": 93,
+        "path": "mip-m43.sol/mipm43.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envPath": "proposals/mips/mip-x19/x19.sh",
+        "governor": "MultichainGovernor",
+        "id": 92,
+        "path": "RewardsDistribution.sol/RewardsDistributionTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-b42/b42.sh",
+        "governor": "MultichainGovernor",
+        "id": 91,
+        "path": "mipb42.sol/mipb42.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x18/x18.sh",
+        "governor": "MultichainGovernor",
+        "id": 86,
+        "path": "MarketUpdate.sol/MarketUpdateTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envPath": "proposals/mips/mip-x16/x16.sh",
+        "governor": "MultichainGovernor",
+        "id": 85,
+        "path": "RewardsDistribution.sol/RewardsDistributionTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "",
+        "governor": "MultichainGovernor",
+        "id": 84,
+        "path": "mip-o13.sol/mipo13.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x15/x15.sh",
+        "governor": "MultichainGovernor",
+        "id": 83,
+        "path": "MarketUpdate.sol/MarketUpdateTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "",
+        "governor": "MultichainGovernor",
+        "id": 82,
+        "path": "mip-x14.sol/mipx14.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envPath": "proposals/mips/mip-x13/x13.sh",
+        "governor": "MultichainGovernor",
+        "id": 81,
+        "path": "RewardsDistribution.sol/RewardsDistributionTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
         "envpath": "proposals/mips/mip-b41/b41.sh",
         "governor": "MultichainGovernor",
         "id": 80,
@@ -510,13 +622,6 @@
         "governor": "ArtemisGovernor",
         "id": 51,
         "path": "mip-b05.sol/mipb05.json",
-        "proposalType": "HybridProposal"
-    },
-    {
-        "envPath": "proposals/mips/mip-b03/b03.sh",
-        "governor": "ArtemisGovernor",
-        "id": 43,
-        "path": "MarketAdd.sol/MarketAddTemplate.json",
         "proposalType": "HybridProposal"
     },
     {

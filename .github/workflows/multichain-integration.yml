@@ -118,13 +118,7 @@ jobs:
         run: chmod +x bin/run-onchain-calldata-check.sh
 
       - name: Run Test Proposal Calldata Generation
-        uses: nick-fields/retry@v3
-        with:
-           polling_interval_seconds: 30
-           retry_wait_seconds: 60
-           timeout_minutes: 20
-           max_attempts: 3
-           command: bin/run-onchain-calldata-check.sh
+        run: bin/run-onchain-calldata-check.sh
 
   run-in-development-proposal:
     name: In Development Proposal

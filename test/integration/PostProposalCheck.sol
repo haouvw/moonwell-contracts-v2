@@ -25,10 +25,17 @@ contract PostProposalCheck is LiveProposalCheck {
     /// @notice array of proposals in development
     Proposal[] public proposals;
 
+    /// @notice store the proposal start time so that tests can go back in time
+    /// to this point if needed. Used in ReserveAutomationDeploy Integration Test
+    uint256 public proposalStartTime;
+
     function setUp() public virtual override {
+        uint256 primaryForkBefore = vm.envOr("PRIMARY_FORK_ID", uint256(0));
         super.setUp();
 
         MOONBEAM_FORK_ID.createForksAndSelect();
+
+        proposalStartTime = block.timestamp;
 
         addresses = new Addresses();
         vm.makePersistent(address(addresses));
@@ -76,5 +83,7 @@ contract PostProposalCheck is LiveProposalCheck {
         }
 
         addresses.removeAllRestrictions();
+
+        vm.setEnv("PRIMARY_FORK_ID", vm.toString(primaryForkBefore));
     }
 }
