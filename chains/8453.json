@@ -1,5 +1,30 @@
 [
     {
+        "addr": "0x86CBee66b3FF313Af153e697f4DC02d423ACD5CE",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_WETH_MIP_X24"
+    },
+    {
+        "addr": "0xc27e9327a81bfAF33e5b0CC3Edc7112cC259b96b",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_cbBTC_MIP_X24"
+    },
+    {
+        "addr": "0xbcC4D66cFFbF3A5D75669984700FbC1FeaBE8487",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_LBTC_MIP_X24"
+    },
+    {
+        "addr": "0x670136DBdb194b051fc9A5e973ccfB825E7f45F6",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_TBTC_MIP_X24"
+    },
+    {
+        "addr": "0xe8A41eC7fE1C991E7cfBa7f5AA1b5895EAc8307D",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_AERO_MIP_X24"
+    },
+    {
         "addr": "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb",
         "isContract": true,
         "name": "MORPHO_BLUE"
@@ -1043,5 +1068,15 @@
         "addr": "0x9f0C1dD78C4CBdF5b9cf923a549A201EdC676D34",
         "isContract": true,
         "name": "CHAINLINK_cbXRP_USD"
+    },
+    {
+        "addr": "0xcB95579c706144f3150f7C3b1BD3F24A48d3463e",
+        "isContract": true,
+        "name": "JUMP_RATE_IRM_MOONWELL_cbXRP"
+    },
+    {
+        "addr": "0xb4fb8fed5b3AaA8434f0B19b1b623d977e07e86d",
+        "isContract": true,
+        "name": "MOONWELL_cbXRP"
     }
 ]

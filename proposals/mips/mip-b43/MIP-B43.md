@@ -1,4 +1,4 @@
-# **MIP-B43: Add cbXRP to Base Core Markets**
+# MIP-B43: Add cbXRP to Base Core Markets
 
 ## cbXRP: Short Summary
 

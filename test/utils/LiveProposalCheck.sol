@@ -206,8 +206,12 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
 
         mockWell(addresses, governor);
 
+        uint256 timestampBefore = vm.getBlockTimestamp();
+
         for (uint256 i = 0; i < liveProposals.length; i++) {
             _execProposal(addresses, governor, liveProposals[i]);
+
+            vm.warp(timestampBefore);
         }
     }
 
@@ -288,6 +292,10 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
 
         proposal.beforeSimulationHook(addresses);
 
+        console.log("wormholeCore");
+        console.log(wormholeCore);
+        console.log("governor");
+        console.log(address(governor));
         uint64 nextSequence = IWormhole(wormholeCore).nextSequence(
             address(governor)
         );
@@ -397,27 +405,33 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
             // if not, checkout to Optimism fork id
             vm.selectFork(OPTIMISM_FORK_ID);
         }
+
+        uint256 activeFork = vm.activeFork();
         vm.warp(crossChainVoteCollectionEndTimestamp);
 
-        address expectedTemporalGov = addresses.getAddress("TEMPORAL_GOVERNOR");
+        TemporalGovernor temporalGovernor;
+        bytes memory vaa;
+        {
+            address expectedTemporalGov = addresses.getAddress(
+                "TEMPORAL_GOVERNOR"
+            );
 
-        require(
-            temporalGovernorAddress == expectedTemporalGov,
-            "Temporal Governor address mismatch"
-        );
+            require(
+                temporalGovernorAddress == expectedTemporalGov,
+                "Temporal Governor address mismatch"
+            );
 
-        checkBaseOptimismActions(baseTargets);
+            checkBaseOptimismActions(baseTargets);
 
-        bytes memory vaa = generateVAA(
-            uint32(block.timestamp),
-            block.chainid.toMoonbeamWormholeChainId(),
-            address(governor).toBytes(),
-            payload
-        );
+            vaa = generateVAA(
+                uint32(block.timestamp),
+                block.chainid.toMoonbeamWormholeChainId(),
+                address(governor).toBytes(),
+                payload
+            );
 
-        TemporalGovernor temporalGovernor = TemporalGovernor(
-            payable(expectedTemporalGov)
-        );
+            temporalGovernor = TemporalGovernor(payable(expectedTemporalGov));
+        }
 
         {
             // Deploy the modified Wormhole Core implementation contract which
@@ -465,6 +479,11 @@ contract LiveProposalCheck is Test, ProposalChecker, Networks {
 
             proposal.initProposal(addresses);
             proposal.beforeSimulationHook(addresses);
+
+            vm.selectFork(activeFork);
+
+            console.log("temporalGovernor");
+            console.log(address(temporalGovernor));
 
             temporalGovernor.executeProposal(vaa);
 
