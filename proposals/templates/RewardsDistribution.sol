@@ -365,6 +365,9 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             bytes32(uint256(153)),
             encodedData
         );
+
+        // TODO remove this before going live
+        vm.warp(1751583915);
     }
 
     function _saveMoonbeamActions(
@@ -1831,10 +1834,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
-                // lastUpdateTime
                 ,
 
-            ) = multiRewards.rewardData(
+            ) = // lastUpdateTime
+                multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 

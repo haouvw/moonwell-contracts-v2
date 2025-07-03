@@ -276,14 +276,14 @@
                 "duration": 2419200,
                 "reward": 1.0110463608349985e23,
                 "rewardToken": "xWELL_PROXY",
-                "vault": "USDC_METAMORPHO_VAULT"
+                "vault": "USDC_MULTI_REWARDER"
             },
             {
                 "distributor": "TEMPORAL_GOVERNOR",
                 "duration": 2419200,
                 "reward": 1e22,
                 "rewardToken": "OP",
-                "vault": "USDC_METAMORPHO_VAULT"
+                "vault": "USDC_MULTI_REWARDER"
             }
         ]
     },
