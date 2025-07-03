@@ -1,6 +1,6 @@
 #!/bin/bash
-export JSON_PATH=proposals/mips/mip-x26/x26.json
-echo "JSON_PATH=$JSON_PATH"
+export MIP_REWARDS_PATH=proposals/mips/mip-x26/x26.json
+echo "MIP_REWARDS_PATH=$MIP_REWARDS_PATH"
 
 export DESCRIPTION_PATH=proposals/mips/mip-x26/x26.md
 echo "DESCRIPTION_PATH=$DESCRIPTION_PATH"
