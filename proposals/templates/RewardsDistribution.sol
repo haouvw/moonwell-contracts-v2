@@ -335,10 +335,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
             bytes32(uint256(153)),
             encodedData
         );
-
-        // TODO remove this before going live
-        console.log("warp to 1751583915");
-        vm.warp(1751583915);
     }
 
     function afterSimulationHook(Addresses addresses) public override {
@@ -1835,10 +1831,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
-                // lastUpdateTime
                 ,
 
-            ) = multiRewards.rewardData(
+            ) = // lastUpdateTime
+                multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
