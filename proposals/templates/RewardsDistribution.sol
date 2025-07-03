@@ -312,16 +312,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                     vm.startPrank(
                         addresses.getAddress("FOUNDATION_OP_MULTISIG")
                     );
-                    IERC20(addresses.getAddress("OP")).transfer(
-                        addresses.getAddress("TEMPORAL_GOVERNOR"),
-                        1e22
-                    );
-
                     IERC20(addresses.getAddress("OP")).approve(
-                        addresses.getAddress("MRD_PROXY"),
-                        5e22
+                        addresses.getAddress("TEMPORAL_GOVERNOR"),
+                        6e22
                     );
-
                     vm.stopPrank();
                 }
 
@@ -1841,10 +1835,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 

@@ -211,6 +211,12 @@
                 "token": "OP"
             },
             {
+                "amount": 1e22,
+                "from": "FOUNDATION_OP_MULTISIG",
+                "to": "TEMPORAL_GOVERNOR",
+                "token": "OP"
+            },
+            {
                 "amount": 1.725213601928828e24,
                 "from": "TEMPORAL_GOVERNOR",
                 "to": "MRD_PROXY",
