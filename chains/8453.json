@@ -1078,5 +1078,10 @@
         "addr": "0xb4fb8fed5b3AaA8434f0B19b1b623d977e07e86d",
         "isContract": true,
         "name": "MOONWELL_cbXRP"
+    },
+    {
+        "addr": "0x08eDEbFFaE68970DCf751baa826182b3a4aCFC05",
+        "isContract": true,
+        "name": "ANTHIAS_MULTISIG"
     }
 ]
