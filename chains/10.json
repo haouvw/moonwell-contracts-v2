@@ -1,5 +1,20 @@
 [
     {
+        "addr": "0x0FC39BF0dEA1ce1bEE4Be77680f4F55f4ef3f8eF",
+        "name": "JUMP_RATE_IRM_MOONWELL_USDC_MIP_X24",
+        "isContract": true
+    },
+    {
+        "addr": "0x22aD8a160e4785223cD03A86d02c3ccc2838E9FF",
+        "name": "JUMP_RATE_IRM_MOONWELL_USDT0_MIP_X24",
+        "isContract": true
+    },
+    {
+        "addr": "0x01635c141C070944EAE7919443ff61dB2a6a4597",
+        "name": "JUMP_RATE_IRM_MOONWELL_WETH_MIP_X24",
+        "isContract": true
+    },
+    {
         "addr": "0x4200000000000000000000000000000000000006",
         "isContract": true,
         "name": "WETH"
@@ -653,5 +668,10 @@
         "addr": "0x2EED2b7d44E2cF64a41B6b3f78bE2Fdc56223d2B",
         "isContract": true,
         "name": "USDC_MULTI_REWARDER"
+    },
+    {
+        "addr": "0x39Bd42ce85CcC2f8792f13B2726369cD3F946D7c",
+        "isContract": true,
+        "name": "ANTHIAS_MULTISIG"
     }
 ]

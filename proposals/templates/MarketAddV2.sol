@@ -103,7 +103,6 @@ contract MarketAddV2 is HybridProposal, Networks, ParameterValidation {
         if (DO_TEARDOWN) teardown(addresses, deployerAddress);
         if (DO_VALIDATE) {
             validate(addresses, deployerAddress);
-            console.log("Validation completed for proposal ", this.name());
         }
         if (DO_PRINT) {
             printProposalActionSteps();

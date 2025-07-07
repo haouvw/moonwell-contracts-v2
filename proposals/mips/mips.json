@@ -7,6 +7,41 @@
         "proposalType": "HybridProposal"
     },
     {
+        "envpath": "",
+        "governor": "MultichainGovernor",
+        "id": 106,
+        "path": "x25.sol/x25.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x24/x24.sh",
+        "governor": "MultichainGovernor",
+        "id": 105,
+        "path": "MarketUpdate.sol/MarketUpdateTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "",
+        "governor": "MultichainGovernor",
+        "id": 103,
+        "path": "b44.sol/b44.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-b43/b43.sh",
+        "governor": "MultichainGovernor",
+        "id": 104,
+        "path": "MarketAddV2.sol/MarketAddV2.json",
+        "proposalType": "HybridProposal"
+    },
+    {
+        "envpath": "proposals/mips/mip-x23/x23.sh",
+        "governor": "MultichainGovernor",
+        "id": 100,
+        "path": "RewardsDistribution.sol/RewardsDistributionTemplate.json",
+        "proposalType": "HybridProposal"
+    },
+    {
         "envpath": "proposals/mips/mip-x22/x22.sh",
         "governor": "MultichainGovernor",
         "id": 99,

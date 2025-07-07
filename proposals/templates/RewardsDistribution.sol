@@ -251,7 +251,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 stellaSwapRewarder
             );
         }
-
         _saveMoonbeamActions(addresses, encodedJson);
     }
 
@@ -330,6 +329,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
         WormholeBridgeAdapter wormholeBridgeAdapter = WormholeBridgeAdapter(
             addresses.getAddress("WORMHOLE_BRIDGE_ADAPTER_PROXY")
         );
+        vm.makePersistent(address(wormholeBridgeAdapter));
 
         uint256 gasLimit = wormholeBridgeAdapter.gasLimit();
 
@@ -1258,24 +1258,18 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 multiRewarder.rewardToken
             );
 
-            try IMultiRewards(distributor).rewardData(rewardToken) returns (
-                address,
-                uint256,
-                uint256,
-                uint256,
-                uint256,
-                uint256
-            ) {
-                // rewardData exists
-            } catch {
-                // rewardData does not exist, call addReward
+            address vault = addresses.getAddress(multiRewarder.vault);
+
+            uint256 duration = multiRewarder.duration;
+
+            if (vm.envOr("FORCE_ADD_REWARD", false)) {
                 _pushAction(
-                    addresses.getAddress(multiRewarder.vault),
+                    vault,
                     abi.encodeWithSignature(
                         "addReward(address,address,uint256)",
                         rewardToken,
                         distributor,
-                        multiRewarder.duration
+                        duration
                     ),
                     string.concat(
                         "Add reward for ",
@@ -1283,32 +1277,77 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                         " on ",
                         multiRewarder.vault,
                         " with duration ",
-                        vm.toString(multiRewarder.duration),
+                        vm.toString(duration),
                         " with distributor ",
                         multiRewarder.distributor
                     )
                 );
+            } else {
+                try IMultiRewards(vault).rewardData(rewardToken) returns (
+                    address,
+                    uint256,
+                    uint256,
+                    uint256,
+                    uint256,
+                    uint256
+                ) {
+                    _pushAction(
+                        vault,
+                        abi.encodeWithSignature(
+                            "setRewardsDuration(address,uint256)",
+                            rewardToken,
+                            duration
+                        ),
+                        string.concat(
+                            "Set reward duration for ",
+                            vm.getLabel(rewardToken),
+                            " on ",
+                            multiRewarder.vault,
+                            " with duration ",
+                            vm.toString(duration)
+                        )
+                    );
+                } catch {
+                    _pushAction(
+                        vault,
+                        abi.encodeWithSignature(
+                            "addReward(address,address,uint256)",
+                            rewardToken,
+                            distributor,
+                            duration
+                        ),
+                        string.concat(
+                            "Add reward for ",
+                            vm.getLabel(rewardToken),
+                            " on ",
+                            multiRewarder.vault,
+                            " with duration ",
+                            vm.toString(duration),
+                            " with distributor ",
+                            multiRewarder.distributor
+                        )
+                    );
+                }
             }
-
             // approve the vault to spend the reward token
             _pushAction(
                 rewardToken,
                 abi.encodeWithSignature(
                     "approve(address,uint256)",
-                    addresses.getAddress(multiRewarder.vault),
+                    vault,
                     multiRewarder.reward
                 ),
                 string.concat(
                     "Approve ",
                     vm.getLabel(rewardToken),
                     " to ",
-                    vm.getLabel(addresses.getAddress(multiRewarder.vault))
+                    vm.getLabel(vault)
                 )
             );
 
             // Notify reward amount
             _pushAction(
-                addresses.getAddress(multiRewarder.vault),
+                vault,
                 abi.encodeWithSignature(
                     "notifyRewardAmount(address,uint256)",
                     rewardToken,
@@ -1780,10 +1819,10 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
+                // lastUpdateTime
                 ,
 
-            ) = // lastUpdateTime
-                multiRewards.rewardData(
+            ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
                 );
 
