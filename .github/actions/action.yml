@@ -20,7 +20,7 @@ runs:
     - name: Install Foundry
       uses: foundry-rs/foundry-toolchain@v1
       with:
-        version: nightly-e52076714ace23c7a68e14f0048a40be3c6c8f0b
+        version: nightly-4435b4602bcbcf2b2e0e26b2fbc6626fe2e0b3ad
 
     - name: Clean Contracts
       run: forge clean
