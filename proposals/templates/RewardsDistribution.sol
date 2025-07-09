@@ -1823,7 +1823,7 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
 
             ) = multiRewards.rewardData(
                     addresses.getAddress(rewarder.rewardToken)
-                );
+                ); // lastUpdateTime
 
             // Validate reward configuration
             assertEq(
