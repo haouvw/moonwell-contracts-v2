@@ -7,7 +7,7 @@ https://forum.moonwell.fi/t/switching-moonwells-glmr-market-to-using-api3s-oev-e
 
 [Moonwell Governance Call: December 2024](https://www.youtube.com/watch?time_continue=525&v=UIqNapXXrqA&embeds_referring_euri=https%3A%2F%2Fforum.moonwell.fi%2F&source_ve_path=Mjg2NjY)
 
-**Submission Date:** 07/07/2025
+**Submission Date:** 09/07/2025
 
 **Summary**
 
