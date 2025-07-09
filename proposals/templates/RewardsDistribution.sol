@@ -1819,7 +1819,6 @@ contract RewardsDistributionTemplate is HybridProposal, Networks {
                 uint256 rewardsDuration,
                 uint256 periodFinish,
                 uint256 rewardRate, // rewardPerTokenStored
-                // lastUpdateTime
                 ,
 
             ) = multiRewards.rewardData(
